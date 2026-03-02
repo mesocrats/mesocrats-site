@@ -95,8 +95,8 @@ The most powerful military on earth, funded with accountability. DoD audit tied 
 ### Criminal Justice -- "Safe Streets. Fair System."
 Fully fund police with better training. End mandatory minimums for nonviolent drug offenses. Death penalty moratorium. Marijuana reform. Record-sealing.
 
-### Energy & Environment -- "All of the Above."
-Clean energy acceleration including nuclear. One-year permit shot-clock. Fossil fuels as bridge. Methane controls. Worker transition fund.
+### Energy & Environment -- "Dominate Every Source. Depend on No One."
+Full-spectrum energy dominance: nuclear, solar, wind, natural gas, hydrogen, geothermal, fusion research. One-year federal permit shot-clock. No bans on any source that works. Methane controls. Worker transition fund. Energy independence is national security.
 
 ### Housing -- "A Home You Can Afford."
 Build more homes. Ban institutional investors from buying single-family homes. Matched down-payments. Zoning reform. Housing First for homelessness.

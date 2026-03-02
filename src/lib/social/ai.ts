@@ -40,7 +40,13 @@ Return as a JSON array with objects: { "content": string, "category": "tech_stor
   }
 
   if (platform === "twitter" && type === "policy_morning") {
-    return `Generate ${count} morning policy tweets, one for each day of the week starting ${weekStart || "Monday"}. Each tweet connects a Mesocratic policy position to something in recent US news (past 6 months). Under 280 characters. Direct, warm, grounded. Use the Issue Framework in abbreviated form. No hashtag spam (0-1 hashtag).${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ""}
+    return `Generate ${count} morning policy tweets, one for each day of the week starting ${weekStart || "Monday"}. Each tweet connects a Mesocratic policy position to something in recent US news (past 6 months). Under 280 characters. Direct, warm, grounded. Use the Issue Framework in abbreviated form. No hashtag spam (0-1 hashtag).
+
+IMPORTANT: Never reference internal policy framework names, marketing slogans, or taglines in tweets. For example, do not say "Our All of the Above framework" or "Our Strong and Accountable position" or "The Two-Tier Plan." These are internal labels that mean nothing to a general audience. Instead, describe the SUBSTANCE of the policy in plain language. Say what we believe, not what we named it.
+BAD: "Our All of the Above energy framework includes nuclear and renewables."
+GOOD: "We support every energy source that works — nuclear, solar, wind, natural gas. Energy dominance means depending on no one."
+BAD: "The Mesocratic Strong and Accountable defense position demands oversight."
+GOOD: "A strong military needs real accountability. Tie funding to audits. Define objectives before deploying troops."${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ""}
 
 Return as a JSON array with objects: { "content": string, "category": "policy_morning", "suggested_day": "Monday" | "Tuesday" | etc., "policy_topic": string }`;
   }
@@ -58,7 +64,13 @@ CRITICAL TONE RULES FOR CURRENT EVENTS TWEETS:
 - We never attack individuals by name. We never attack parties by name in tweets. We state our position and let the contrast speak for itself.
 - Think of it as: "Here's what's happening. Here's how we'd approach it. Here's what it means for you."
 - BAD example: "Americans shouldn't have to guess about war objectives. We need transparency from leadership."
-- GOOD example: "Our Strong and Accountable framework ties every military action to defined objectives and congressional oversight. That's what accountability looks like."${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ""}
+- GOOD example: "A strong military needs real accountability. Tie funding to audits. Define objectives before deploying troops. That's what oversight looks like."
+
+IMPORTANT: Never reference internal policy framework names, marketing slogans, or taglines in tweets. For example, do not say "Our All of the Above framework" or "Our Strong and Accountable position" or "The Two-Tier Plan." These are internal labels that mean nothing to a general audience. Instead, describe the SUBSTANCE of the policy in plain language. Say what we believe, not what we named it.
+BAD: "Our All of the Above energy framework includes nuclear and renewables."
+GOOD: "We support every energy source that works — nuclear, solar, wind, natural gas. Energy dominance means depending on no one."
+BAD: "The Mesocratic Strong and Accountable defense position demands oversight."
+GOOD: "A strong military needs real accountability. Tie funding to audits. Define objectives before deploying troops."${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ""}
 
 Return as a JSON array with objects: { "content": string, "category": "current_events", "news_reference": string }`;
   }
