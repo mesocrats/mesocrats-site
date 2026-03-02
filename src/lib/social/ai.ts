@@ -20,7 +20,7 @@ interface GenerateOptions {
   additionalContext?: string;
 }
 
-function buildSystemPrompt(platform: Platform): string {
+function buildSystemPrompt(): string {
   return `${MESOCRATIC_REFERENCE_GUIDE}
 
 ---
@@ -63,7 +63,7 @@ export async function generatePosts(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("Missing ANTHROPIC_API_KEY");
 
-  const systemPrompt = buildSystemPrompt(options.platform);
+  const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt(options);
 
   const useWebSearch =
