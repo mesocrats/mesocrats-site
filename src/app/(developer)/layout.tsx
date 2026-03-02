@@ -47,8 +47,10 @@ export default function DeveloperLayout({
 }) {
   return (
     <div
-      className={`${dmSans.variable} ${jetbrainsMono.variable} font-dev-sans bg-[#0A0A15] text-white min-h-screen overscroll-y-none`}
+      className={`${dmSans.variable} ${jetbrainsMono.variable} font-dev-sans bg-[#0A0A15] text-white min-h-screen`}
     >
+      {/* Override html/body background to prevent white flash during overscroll */}
+      <style>{`html,body{background:#0A0A15!important;overscroll-behavior-y:none}`}</style>
       <AuthProviderWrapper>
         <DevNavBar />
         <main>{children}</main>
