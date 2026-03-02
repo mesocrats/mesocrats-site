@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
+  console.log("MW hostname:", request.headers.get("x-forwarded-host") || request.headers.get("host") || request.nextUrl.hostname);
+
   // Check multiple hostname sources -- Vercel may use x-forwarded-host
   const forwardedHost = request.headers.get("x-forwarded-host") || "";
   const hostHeader = request.headers.get("host") || "";
@@ -16,6 +18,24 @@ export function middleware(request: NextRequest) {
     forwardedHost.startsWith("developer.localhost") ||
     hostHeader.startsWith("developer.localhost") ||
     nextUrlHost === "developer.localhost";
+
+  const isSocialSubdomain =
+    forwardedHost.startsWith("social.mesocrats.org") ||
+    hostHeader.startsWith("social.mesocrats.org") ||
+    nextUrlHost === "social.mesocrats.org" ||
+    forwardedHost.startsWith("social.localhost") ||
+    hostHeader.startsWith("social.localhost") ||
+    nextUrlHost === "social.localhost";
+
+  if (isSocialSubdomain) {
+    if (pathname.startsWith("/social")) {
+      return NextResponse.next();
+    }
+
+    const url = request.nextUrl.clone();
+    url.pathname = `/social${pathname}`;
+    return NextResponse.rewrite(url);
+  }
 
   if (isDeveloperSubdomain) {
     // Already has /developer prefix -- don't double-prepend
@@ -41,6 +61,12 @@ export function middleware(request: NextRequest) {
     nextUrlHost === "localhost" ||
     hostHeader.startsWith("localhost") ||
     forwardedHost.startsWith("localhost");
+
+  if (!isLocalhost && pathname.startsWith("/social")) {
+    const subpath = pathname.replace(/^\/social/, "") || "/";
+    const redirectUrl = `https://social.mesocrats.org${subpath}`;
+    return NextResponse.redirect(redirectUrl, 301);
+  }
 
   if (!isLocalhost && pathname.startsWith("/developer")) {
     const subpath = pathname.replace(/^\/developer/, "") || "/";
