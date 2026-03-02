@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Check, X } from "lucide-react";
 import { useSocialAuth } from "../../components/SocialAuthProvider";
 
 interface GeneratedPost {
@@ -32,6 +33,46 @@ const modes: { value: GenerationMode; label: string; description: string }[] = [
   },
 ];
 
+const DAY_MAP: Record<string, number> = {
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+  sunday: 0,
+};
+
+function getScheduledDate(suggestedDay?: string): string {
+  if (!suggestedDay) {
+    // Default to tomorrow, skip weekends
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    d.setHours(9, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  const targetDay = DAY_MAP[suggestedDay.toLowerCase()];
+  if (targetDay === undefined) {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    d.setHours(9, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  // Find the next occurrence of targetDay from today
+  const today = new Date();
+  const currentDay = today.getDay();
+  let diff = targetDay - currentDay;
+  if (diff <= 0) diff += 7;
+  const target = new Date(today);
+  target.setDate(today.getDate() + diff);
+  target.setHours(9, 0, 0, 0);
+  return target.toISOString();
+}
+
 export default function GeneratePage() {
   const { user, loading, session } = useSocialAuth();
   const router = useRouter();
@@ -39,9 +80,11 @@ export default function GeneratePage() {
   const [additionalContext, setAdditionalContext] = useState("");
   const [generating, setGenerating] = useState(false);
   const [results, setResults] = useState<GeneratedPost[]>([]);
+  const [editedContent, setEditedContent] = useState<Record<number, string>>({});
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState<Set<number>>(new Set());
-  const [saved, setSaved] = useState<Set<number>>(new Set());
+  const [approving, setApproving] = useState<Set<number>>(new Set());
+  const [approved, setApproved] = useState<Set<number>>(new Set());
+  const [rejected, setRejected] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (!loading && !user) {
@@ -53,7 +96,9 @@ export default function GeneratePage() {
     setGenerating(true);
     setError(null);
     setResults([]);
-    setSaved(new Set());
+    setEditedContent({});
+    setApproved(new Set());
+    setRejected(new Set());
 
     const modeConfig: Record<GenerationMode, { platform: string; type?: string; count: number }> = {
       linkedin_week: { platform: "linkedin", count: 5 },
@@ -98,51 +143,60 @@ export default function GeneratePage() {
     }
   }
 
-  async function handleSave(index: number) {
-    const post = results[index];
-    if (!post || !session) return;
+  const handleApprove = useCallback(
+    async (index: number) => {
+      const post = results[index];
+      if (!post || !session) return;
 
-    setSaving((prev) => new Set(prev).add(index));
+      setApproving((prev) => new Set(prev).add(index));
 
-    const platform = mode === "linkedin_week" ? "linkedin" : "twitter";
+      const platform = mode === "linkedin_week" ? "linkedin" : "twitter";
+      const content = editedContent[index] ?? post.content;
 
-    try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          content: post.content,
-          platform,
-          category: post.category,
-          status: "draft",
-          policy_topic: post.policy_topic || null,
-          news_reference: post.news_reference || null,
-        }),
-      });
+      try {
+        const res = await fetch("/api/posts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            content,
+            platform,
+            category: post.category,
+            status: "approved",
+            scheduled_at: getScheduledDate(post.suggested_day),
+            policy_topic: post.policy_topic || null,
+            news_reference: post.news_reference || null,
+          }),
+        });
 
-      if (res.ok) {
-        setSaved((prev) => new Set(prev).add(index));
+        if (res.ok) {
+          setApproved((prev) => new Set(prev).add(index));
+        }
+      } catch {
+        // silent
+      } finally {
+        setApproving((prev) => {
+          const next = new Set(prev);
+          next.delete(index);
+          return next;
+        });
       }
-    } catch {
-      // silent
-    } finally {
-      setSaving((prev) => {
-        const next = new Set(prev);
-        next.delete(index);
-        return next;
-      });
+    },
+    [results, session, mode, editedContent]
+  );
+
+  async function handleApproveAll() {
+    for (let i = 0; i < results.length; i++) {
+      if (!approved.has(i) && !rejected.has(i)) {
+        await handleApprove(i);
+      }
     }
   }
 
-  async function handleSaveAll() {
-    for (let i = 0; i < results.length; i++) {
-      if (!saved.has(i)) {
-        await handleSave(i);
-      }
-    }
+  function handleReject(index: number) {
+    setRejected((prev) => new Set(prev).add(index));
   }
 
   if (loading || !user) {
@@ -157,6 +211,10 @@ export default function GeneratePage() {
     twitter: "border-sky-500/30",
     linkedin: "border-blue-600/30",
   };
+
+  const visibleResults = results.filter((_, i) => !rejected.has(i));
+  const allHandled = results.every((_, i) => approved.has(i) || rejected.has(i));
+  const pendingCount = results.filter((_, i) => !approved.has(i) && !rejected.has(i)).length;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -222,25 +280,37 @@ export default function GeneratePage() {
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-white">
-              Generated Posts ({results.length})
+              Generated Posts ({visibleResults.length})
             </h2>
-            <button
-              onClick={handleSaveAll}
-              className="px-4 py-1.5 text-sm text-[#4374BA] border border-[#4374BA]/30 rounded-lg hover:bg-[#4374BA]/10 transition-colors"
-            >
-              Save All as Drafts
-            </button>
+            {!allHandled && pendingCount > 0 && (
+              <button
+                onClick={handleApproveAll}
+                className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-500 rounded-lg transition-colors"
+              >
+                <Check className="w-4 h-4" />
+                Approve All ({pendingCount})
+              </button>
+            )}
           </div>
 
           <div className="space-y-4">
             {results.map((post, i) => {
+              if (rejected.has(i)) return null;
+
               const platform = mode === "linkedin_week" ? "linkedin" : "twitter";
+              const isApproved = approved.has(i);
+              const isApproving = approving.has(i);
+
               return (
                 <div
                   key={i}
-                  className={`border rounded-xl p-4 ${platformColors[platform] || "border-white/[0.06]"} bg-white/[0.02]`}
+                  className={`border rounded-xl p-4 transition-all ${
+                    isApproved
+                      ? "border-green-500/30 bg-green-500/5"
+                      : platformColors[platform] || "border-white/[0.06]"
+                  } bg-white/[0.02]`}
                 >
-                  <div className="flex items-start justify-between gap-4 mb-2">
+                  <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex items-center gap-2">
                       {post.suggested_day && (
                         <span className="text-xs text-gray-500">
@@ -250,26 +320,54 @@ export default function GeneratePage() {
                       <span className="text-xs text-gray-600">
                         {post.category}
                       </span>
+                      {isApproved && (
+                        <span className="flex items-center gap-1 text-xs font-medium text-green-400 bg-green-500/10 px-2 py-0.5 rounded-full">
+                          <Check className="w-3 h-3" />
+                          Approved
+                        </span>
+                      )}
                     </div>
-                    <button
-                      onClick={() => handleSave(i)}
-                      disabled={saving.has(i) || saved.has(i)}
-                      className={`shrink-0 px-3 py-1 text-xs rounded-md transition-colors ${
-                        saved.has(i)
-                          ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                          : "bg-white/[0.04] text-gray-400 hover:text-white border border-white/[0.08]"
-                      }`}
-                    >
-                      {saved.has(i)
-                        ? "Saved"
-                        : saving.has(i)
-                          ? "Saving..."
-                          : "Save Draft"}
-                    </button>
+
+                    {!isApproved && (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => handleApprove(i)}
+                          disabled={isApproving}
+                          title="Approve"
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-green-600 hover:bg-green-500 text-white transition-colors disabled:opacity-50"
+                        >
+                          {isApproving ? (
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          ) : (
+                            <Check className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleReject(i)}
+                          title="Reject"
+                          className="w-8 h-8 flex items-center justify-center rounded-full bg-red-600 hover:bg-red-500 text-white transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-300 whitespace-pre-wrap">
-                    {post.content}
-                  </p>
+
+                  {isApproved ? (
+                    <p className="text-sm text-gray-300 whitespace-pre-wrap">
+                      {editedContent[i] ?? post.content}
+                    </p>
+                  ) : (
+                    <textarea
+                      value={editedContent[i] ?? post.content}
+                      onChange={(e) =>
+                        setEditedContent((prev) => ({ ...prev, [i]: e.target.value }))
+                      }
+                      rows={Math.max(3, (editedContent[i] ?? post.content).split("\n").length + 1)}
+                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-[#4374BA]/50 resize-y"
+                    />
+                  )}
+
                   {post.policy_topic && (
                     <p className="text-xs text-gray-500 mt-2">
                       Policy: {post.policy_topic}

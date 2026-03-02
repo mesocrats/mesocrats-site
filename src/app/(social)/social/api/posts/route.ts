@@ -76,6 +76,18 @@ export async function POST(request: NextRequest) {
 
   const supabase = createServerSupabase();
 
+  // Auto-assign scheduled_at when creating as approved without a date
+  let scheduledAt = body.scheduled_at || null;
+  if (body.status === "approved" && !scheduledAt) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    while (tomorrow.getDay() === 0 || tomorrow.getDay() === 6) {
+      tomorrow.setDate(tomorrow.getDate() + 1);
+    }
+    tomorrow.setHours(9, 0, 0, 0);
+    scheduledAt = tomorrow.toISOString();
+  }
+
   const { data, error } = await supabase
     .from("posts")
     .insert({
@@ -83,10 +95,10 @@ export async function POST(request: NextRequest) {
       platform: body.platform,
       category: body.category || null,
       status: body.status || "draft",
-      scheduled_at: body.scheduled_at || null,
+      scheduled_at: scheduledAt,
       policy_topic: body.policy_topic || null,
       news_reference: body.news_reference || null,
-      generation_type: "manual",
+      generation_type: "ai_generated",
       created_by: user.id,
     })
     .select()

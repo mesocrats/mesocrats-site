@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { Copy, Check, Circle, CheckCircle, X } from "lucide-react";
 import { useSocialAuth } from "../../components/SocialAuthProvider";
 
 interface CalendarPost {
   id: string;
   content: string;
   platform: string;
+  category: string | null;
   status: string;
   scheduled_at: string | null;
   created_at: string;
@@ -16,10 +17,16 @@ interface CalendarPost {
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const platformStyle: Record<string, { bg: string; border: string; text: string }> = {
-  twitter: { bg: "bg-sky-500/10", border: "border-sky-500/30", text: "text-sky-400" },
-  linkedin: { bg: "bg-blue-600/10", border: "border-blue-600/30", text: "text-blue-400" },
-  instagram: { bg: "bg-pink-500/10", border: "border-pink-500/30", text: "text-pink-400" },
+const platformBadge: Record<string, { bg: string; text: string; label: string }> = {
+  twitter: { bg: "bg-[#6B7280]", text: "text-white", label: "X" },
+  linkedin: { bg: "bg-[#4374BA]", text: "text-white", label: "Li" },
+  instagram: { bg: "bg-[#6C3393]", text: "text-white", label: "Ig" },
+};
+
+const platformBorder: Record<string, string> = {
+  twitter: "border-l-[#6B7280]",
+  linkedin: "border-l-[#4374BA]",
+  instagram: "border-l-[#6C3393]",
 };
 
 function getWeekDates(offset: number): Date[] {
@@ -45,11 +52,14 @@ function isSameDay(a: Date, b: Date): boolean {
 }
 
 export default function CalendarPage() {
-  const { user, loading } = useSocialAuth();
+  const { user, loading, session } = useSocialAuth();
   const router = useRouter();
   const [weekOffset, setWeekOffset] = useState(0);
   const [posts, setPosts] = useState<CalendarPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<CalendarPost | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [togglingPublish, setTogglingPublish] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!loading && !user) {
@@ -59,32 +69,85 @@ export default function CalendarPage() {
 
   const weekDates = useMemo(() => getWeekDates(weekOffset), [weekOffset]);
 
-  useEffect(() => {
+  const fetchPosts = useCallback(async () => {
     if (!user) return;
-
-    async function fetchPosts() {
-      setLoadingPosts(true);
-      try {
-        const start = weekDates[0].toISOString();
-        const end = new Date(
-          weekDates[6].getTime() + 24 * 60 * 60 * 1000
-        ).toISOString();
-        const res = await fetch(
-          `/api/posts?scheduled_after=${start}&scheduled_before=${end}&limit=100`
+    setLoadingPosts(true);
+    try {
+      const start = weekDates[0].toISOString();
+      const end = new Date(weekDates[6].getTime() + 24 * 60 * 60 * 1000).toISOString();
+      const res = await fetch(
+        `/api/posts?scheduled_after=${start}&scheduled_before=${end}&limit=100`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        // Only show approved, scheduled, and published posts
+        const filtered = (data.posts || []).filter((p: CalendarPost) =>
+          ["approved", "scheduled", "published"].includes(p.status)
         );
+        setPosts(filtered);
+      }
+    } catch {
+      // silent
+    } finally {
+      setLoadingPosts(false);
+    }
+  }, [user, weekDates]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const togglePublish = useCallback(
+    async (post: CalendarPost, e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!session) return;
+
+      setTogglingPublish((prev) => new Set(prev).add(post.id));
+
+      const newStatus = post.status === "published" ? "approved" : "published";
+
+      try {
+        const res = await fetch(`/api/posts/${post.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
+        });
+
         if (res.ok) {
           const data = await res.json();
-          setPosts(data.posts || []);
+          setPosts((prev) =>
+            prev.map((p) => (p.id === post.id ? { ...p, ...data.post } : p))
+          );
+          // Also update the selected post if it's the one being toggled
+          if (selectedPost?.id === post.id) {
+            setSelectedPost((prev) => (prev ? { ...prev, status: newStatus } : null));
+          }
         }
       } catch {
         // silent
       } finally {
-        setLoadingPosts(false);
+        setTogglingPublish((prev) => {
+          const next = new Set(prev);
+          next.delete(post.id);
+          return next;
+        });
       }
-    }
+    },
+    [session, selectedPost]
+  );
 
-    fetchPosts();
-  }, [user, weekDates]);
+  async function handleCopy(content: string) {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  }
 
   if (loading || !user) {
     return (
@@ -145,7 +208,7 @@ export default function CalendarPage() {
           return (
             <div
               key={i}
-              className={`min-h-[160px] rounded-xl border p-2 ${
+              className={`min-h-[180px] rounded-xl border p-2 ${
                 isToday
                   ? "border-[#4374BA]/40 bg-[#4374BA]/5"
                   : "border-white/[0.06] bg-white/[0.02]"
@@ -154,35 +217,70 @@ export default function CalendarPage() {
               {/* Day header */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-500">{DAYS[i]}</span>
-                <span
-                  className={`text-xs font-medium ${
-                    isToday ? "text-[#4374BA]" : "text-gray-400"
-                  }`}
-                >
-                  {date.getDate()}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  {dayPosts.length > 0 && (
+                    <span className="text-[9px] font-medium text-gray-500 bg-white/[0.06] px-1.5 py-0.5 rounded-full">
+                      {dayPosts.length}
+                    </span>
+                  )}
+                  <span
+                    className={`text-xs font-medium ${
+                      isToday ? "text-[#4374BA]" : "text-gray-400"
+                    }`}
+                  >
+                    {date.getDate()}
+                  </span>
+                </div>
               </div>
 
               {/* Posts */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {loadingPosts ? (
                   <div className="h-8 bg-white/[0.04] rounded animate-pulse" />
                 ) : (
                   dayPosts.map((post) => {
-                    const style = platformStyle[post.platform] || platformStyle.twitter;
+                    const badge = platformBadge[post.platform] || platformBadge.twitter;
+                    const borderColor = platformBorder[post.platform] || "border-l-gray-500";
+                    const isPublished = post.status === "published";
+                    const isToggling = togglingPublish.has(post.id);
+
                     return (
-                      <Link
+                      <div
                         key={post.id}
-                        href={`/posts/${post.id}`}
-                        className={`block p-1.5 rounded-md ${style.bg} border ${style.border} hover:opacity-80 transition-opacity`}
+                        onClick={() => setSelectedPost(post)}
+                        className={`group relative p-1.5 rounded-md bg-white/[0.03] border border-white/[0.06] border-l-2 ${borderColor} hover:bg-white/[0.06] cursor-pointer transition-colors`}
                       >
-                        <p className={`text-[10px] font-medium ${style.text}`}>
-                          {post.platform}
+                        <div className="flex items-center justify-between gap-1 mb-0.5">
+                          <span
+                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${badge.bg} ${badge.text}`}
+                          >
+                            {badge.label}
+                          </span>
+                          <button
+                            onClick={(e) => togglePublish(post, e)}
+                            disabled={isToggling}
+                            title={isPublished ? "Mark as unposted" : "Mark as posted"}
+                            className="transition-colors disabled:opacity-50"
+                          >
+                            {isToggling ? (
+                              <span className="w-3.5 h-3.5 border border-gray-500 border-t-transparent rounded-full animate-spin inline-block" />
+                            ) : isPublished ? (
+                              <CheckCircle className="w-3.5 h-3.5 text-green-400" />
+                            ) : (
+                              <Circle className="w-3.5 h-3.5 text-gray-500 group-hover:text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-gray-400 line-clamp-2 leading-tight">
+                          {post.content.slice(0, 80)}
+                          {post.content.length > 80 ? "..." : ""}
                         </p>
-                        <p className="text-[10px] text-gray-400 line-clamp-2">
-                          {post.content}
-                        </p>
-                      </Link>
+                        {post.category && (
+                          <p className="text-[9px] text-gray-600 mt-0.5">
+                            {post.category.replace(/_/g, " ")}
+                          </p>
+                        )}
+                      </div>
                     );
                   })
                 )}
@@ -191,6 +289,97 @@ export default function CalendarPage() {
           );
         })}
       </div>
+
+      {/* Post Detail Modal */}
+      {selectedPost && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setSelectedPost(null)}
+        >
+          <div
+            className="w-full max-w-lg bg-[#0B0F1A] border border-white/[0.1] rounded-2xl shadow-2xl max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const badge = platformBadge[selectedPost.platform] || platformBadge.twitter;
+                  return (
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${badge.bg} ${badge.text}`}>
+                      {badge.label}
+                    </span>
+                  );
+                })()}
+                {selectedPost.category && (
+                  <span className="text-xs text-gray-500">
+                    {selectedPost.category.replace(/_/g, " ")}
+                  </span>
+                )}
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-full ${
+                    selectedPost.status === "published"
+                      ? "bg-green-500/10 text-green-400"
+                      : "bg-[#4374BA]/10 text-[#4374BA]"
+                  }`}
+                >
+                  {selectedPost.status}
+                </span>
+              </div>
+              <button
+                onClick={() => setSelectedPost(null)}
+                className="text-gray-500 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="p-4 overflow-y-auto flex-1">
+              <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
+                {selectedPost.content}
+              </p>
+            </div>
+
+            {/* Modal footer */}
+            <div className="flex items-center justify-between p-4 border-t border-white/[0.06]">
+              <button
+                onClick={(e) => togglePublish(selectedPost, e)}
+                disabled={togglingPublish.has(selectedPost.id)}
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                  selectedPost.status === "published"
+                    ? "border-green-500/30 text-green-400 hover:bg-green-500/10"
+                    : "border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                }`}
+              >
+                {selectedPost.status === "published" ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <Circle className="w-4 h-4" />
+                )}
+                {selectedPost.status === "published" ? "Posted" : "Mark as Posted"}
+              </button>
+
+              <button
+                onClick={() => handleCopy(selectedPost.content)}
+                className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-[#4374BA] hover:bg-[#4374BA]/80 rounded-lg transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

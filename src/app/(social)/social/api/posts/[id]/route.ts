@@ -55,9 +55,33 @@ export async function PATCH(
   if (body.scheduled_at !== undefined) updates.scheduled_at = body.scheduled_at;
   if (body.rejection_reason !== undefined) updates.rejection_reason = body.rejection_reason;
 
-  // If status is published, set published_at
+  // Status transition logic
   if (body.status === "published") {
     updates.published_at = new Date().toISOString();
+  } else if (body.status === "approved") {
+    // Clear published_at when toggling back from published
+    updates.published_at = null;
+
+    // Auto-assign scheduled_at if not already set and not provided in this request
+    if (body.scheduled_at === undefined) {
+      const { data: existing } = await supabase
+        .from("posts")
+        .select("scheduled_at")
+        .eq("id", id)
+        .single();
+
+      if (existing && !existing.scheduled_at) {
+        // Assign to tomorrow or next weekday
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        // Skip weekends
+        while (tomorrow.getDay() === 0 || tomorrow.getDay() === 6) {
+          tomorrow.setDate(tomorrow.getDate() + 1);
+        }
+        tomorrow.setHours(9, 0, 0, 0);
+        updates.scheduled_at = tomorrow.toISOString();
+      }
+    }
   }
 
   const { data, error } = await supabase

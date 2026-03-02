@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useSocialAuth } from "../components/SocialAuthProvider";
 
 interface DashboardStats {
-  totalPosts: number;
-  pendingReview: number;
-  publishedThisWeek: number;
-  scheduledUpcoming: number;
+  draftCount: number;
+  approvedCount: number;
+  publishedCount: number;
+  weekTotal: number;
 }
 
 interface RecentPost {
@@ -18,6 +18,7 @@ interface RecentPost {
   platform: string;
   status: string;
   created_at: string;
+  updated_at: string;
 }
 
 export default function SocialDashboard() {
@@ -72,31 +73,35 @@ export default function SocialDashboard() {
 
   const statCards = [
     {
-      label: "Total Posts",
-      value: stats?.totalPosts ?? "--",
-      color: "text-white",
+      label: "Generated",
+      sublabel: "Drafts",
+      value: stats?.draftCount ?? "--",
+      color: "text-gray-300",
     },
     {
-      label: "Pending Review",
-      value: stats?.pendingReview ?? "--",
-      color: "text-yellow-400",
-    },
-    {
-      label: "Published This Week",
-      value: stats?.publishedThisWeek ?? "--",
+      label: "Approved",
+      sublabel: "Ready to post",
+      value: stats?.approvedCount ?? "--",
       color: "text-green-400",
     },
     {
-      label: "Scheduled",
-      value: stats?.scheduledUpcoming ?? "--",
+      label: "Published",
+      sublabel: "Actually posted",
+      value: stats?.publishedCount ?? "--",
+      color: "text-emerald-400",
+    },
+    {
+      label: "This Week",
+      sublabel: "Total created",
+      value: stats?.weekTotal ?? "--",
       color: "text-[#4374BA]",
     },
   ];
 
   const platformColors: Record<string, string> = {
-    twitter: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-    linkedin: "bg-blue-600/10 text-blue-400 border-blue-600/20",
-    instagram: "bg-pink-500/10 text-pink-400 border-pink-500/20",
+    twitter: "bg-[#6B7280]/10 text-[#6B7280] border-[#6B7280]/20",
+    linkedin: "bg-[#4374BA]/10 text-[#4374BA] border-[#4374BA]/20",
+    instagram: "bg-[#6C3393]/10 text-[#6C3393] border-[#6C3393]/20",
   };
 
   const statusColors: Record<string, string> = {
@@ -125,7 +130,8 @@ export default function SocialDashboard() {
             key={card.label}
             className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4"
           >
-            <p className="text-xs text-gray-500 mb-1">{card.label}</p>
+            <p className="text-xs text-gray-500 mb-0.5">{card.label}</p>
+            <p className="text-[10px] text-gray-600 mb-1">{card.sublabel}</p>
             <p className={`text-2xl font-bold ${card.color}`}>
               {loadingData ? (
                 <span className="inline-block w-8 h-6 bg-white/[0.06] rounded animate-pulse" />
@@ -164,25 +170,29 @@ export default function SocialDashboard() {
         </Link>
 
         <Link
-          href="/posts/new"
+          href="/calendar"
           className="flex items-center gap-3 p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl hover:border-white/[0.12] transition-colors"
         >
-          <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-[#4374BA]/10 flex items-center justify-center">
             <svg
               width="20"
               height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
+              stroke="#4374BA"
               strokeWidth="2"
             >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-white">New Post</p>
-            <p className="text-xs text-gray-400">Write manually</p>
+            <p className="text-sm font-medium text-white">Calendar</p>
+            <p className="text-xs text-gray-400">
+              {stats ? `${stats.approvedCount} ready to post` : "View schedule"}
+            </p>
           </div>
         </Link>
 
@@ -206,16 +216,16 @@ export default function SocialDashboard() {
           <div>
             <p className="text-sm font-medium text-white">Review Queue</p>
             <p className="text-xs text-gray-400">
-              {stats?.pendingReview ?? 0} pending
+              {stats?.draftCount ?? 0} drafts
             </p>
           </div>
         </Link>
       </div>
 
-      {/* Recent Posts */}
+      {/* Recent Activity */}
       <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl">
         <div className="px-4 py-3 border-b border-white/[0.06]">
-          <h2 className="text-sm font-medium text-white">Recent Posts</h2>
+          <h2 className="text-sm font-medium text-white">Recent Activity</h2>
         </div>
         <div className="divide-y divide-white/[0.04]">
           {loadingData ? (
@@ -233,7 +243,7 @@ export default function SocialDashboard() {
             recentPosts.map((post) => (
               <Link
                 key={post.id}
-                href={`/posts/${post.id}`}
+                href="/calendar"
                 className="block px-4 py-3 hover:bg-white/[0.02] transition-colors"
               >
                 <p className="text-sm text-gray-300 line-clamp-1">
@@ -248,10 +258,10 @@ export default function SocialDashboard() {
                   <span
                     className={`text-xs ${statusColors[post.status] || "text-gray-400"}`}
                   >
-                    {post.status.replace("_", " ")}
+                    {post.status.replace(/_/g, " ")}
                   </span>
                   <span className="text-xs text-gray-600">
-                    {new Date(post.created_at).toLocaleDateString()}
+                    {new Date(post.updated_at || post.created_at).toLocaleDateString()}
                   </span>
                 </div>
               </Link>

@@ -4,33 +4,32 @@ import { createServerSupabase } from "@/lib/social/supabase";
 export async function GET() {
   const supabase = createServerSupabase();
 
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
   // Run all queries in parallel
-  const [totalRes, pendingRes, publishedRes, scheduledRes] = await Promise.all([
-    supabase.from("posts").select("id", { count: "exact", head: true }),
+  const [draftRes, approvedRes, publishedRes, weekTotalRes] = await Promise.all([
     supabase
       .from("posts")
       .select("id", { count: "exact", head: true })
-      .eq("status", "pending_review"),
+      .eq("status", "draft"),
     supabase
       .from("posts")
       .select("id", { count: "exact", head: true })
-      .eq("status", "published")
-      .gte(
-        "published_at",
-        new Date(
-          Date.now() - 7 * 24 * 60 * 60 * 1000
-        ).toISOString()
-      ),
+      .in("status", ["approved", "scheduled"]),
     supabase
       .from("posts")
       .select("id", { count: "exact", head: true })
-      .eq("status", "scheduled"),
+      .eq("status", "published"),
+    supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", weekAgo),
   ]);
 
   return NextResponse.json({
-    totalPosts: totalRes.count ?? 0,
-    pendingReview: pendingRes.count ?? 0,
-    publishedThisWeek: publishedRes.count ?? 0,
-    scheduledUpcoming: scheduledRes.count ?? 0,
+    draftCount: draftRes.count ?? 0,
+    approvedCount: approvedRes.count ?? 0,
+    publishedCount: publishedRes.count ?? 0,
+    weekTotal: weekTotalRes.count ?? 0,
   });
 }
