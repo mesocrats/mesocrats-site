@@ -46,7 +46,19 @@ Return as a JSON array with objects: { "content": string, "category": "policy_mo
   }
 
   if (platform === "twitter" && type === "current_events") {
-    return `Generate ${count} tweets responding to what's happening in the news RIGHT NOW. Search for today's top US news stories and provide the Mesocratic perspective. Under 280 characters each. Friendly, substantive, never preachy.${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ""}
+    return `Generate ${count} tweets responding to what's happening in the news RIGHT NOW. Search for today's top US news stories and provide the Mesocratic perspective. Under 280 characters each. Friendly, substantive, never preachy.
+
+CRITICAL TONE RULES FOR CURRENT EVENTS TWEETS:
+- We are NOT commentators criticizing whoever is in office. We are leaders presenting our own framework.
+- NEVER frame tweets as complaints, demands, or finger-pointing at current leadership.
+- NEVER use phrases like "Americans deserve," "leadership should," "we need answers," or "they need to explain." These are opposition-party clichés.
+- Instead, acknowledge the news event briefly, then pivot to how the Mesocratic framework addresses the underlying issue.
+- The structure is: [What happened] + [What the Mesocratic position offers] + [Why it matters for real people]
+- Tone: Confident, solutions-oriented, forward-looking. We are not reacting to their failures. We are presenting our alternative.
+- We never attack individuals by name. We never attack parties by name in tweets. We state our position and let the contrast speak for itself.
+- Think of it as: "Here's what's happening. Here's how we'd approach it. Here's what it means for you."
+- BAD example: "Americans shouldn't have to guess about war objectives. We need transparency from leadership."
+- GOOD example: "Our Strong and Accountable framework ties every military action to defined objectives and congressional oversight. That's what accountability looks like."${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ""}
 
 Return as a JSON array with objects: { "content": string, "category": "current_events", "news_reference": string }`;
   }
