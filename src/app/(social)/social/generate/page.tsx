@@ -43,34 +43,73 @@ const DAY_MAP: Record<string, number> = {
   sunday: 0,
 };
 
-function getScheduledDate(suggestedDay?: string): string {
-  if (!suggestedDay) {
+// EST posting times (UTC offsets: EST = UTC-5)
+const CURRENT_EVENTS_HOURS_UTC = [15, 18, 22]; // 10 AM, 1 PM, 5 PM EST
+const POLICY_MORNING_HOUR_UTC = 12; // 7 AM EST
+const LINKEDIN_HOUR_UTC = 14; // 9 AM EST
+
+function getScheduledDate(
+  mode: GenerationMode,
+  index: number,
+  suggestedDay?: string
+): string {
+  // Determine the target date
+  let targetDate: Date;
+
+  if (mode === "twitter_today") {
+    // Daily tweets: schedule for today
+    targetDate = new Date();
+  } else if (suggestedDay) {
+    const targetDay = DAY_MAP[suggestedDay.toLowerCase()];
+    if (targetDay !== undefined) {
+      const today = new Date();
+      const currentDay = today.getDay();
+      let diff = targetDay - currentDay;
+      if (diff <= 0) diff += 7;
+      targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + diff);
+    } else {
+      targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 1);
+      while (targetDate.getDay() === 0 || targetDate.getDay() === 6) {
+        targetDate.setDate(targetDate.getDate() + 1);
+      }
+    }
+  } else {
     // Default to tomorrow, skip weekends
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-    d.setHours(9, 0, 0, 0);
-    return d.toISOString();
+    targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 1);
+    while (targetDate.getDay() === 0 || targetDate.getDay() === 6) {
+      targetDate.setDate(targetDate.getDate() + 1);
+    }
   }
 
-  const targetDay = DAY_MAP[suggestedDay.toLowerCase()];
-  if (targetDay === undefined) {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-    d.setHours(9, 0, 0, 0);
-    return d.toISOString();
+  // Set the time in UTC based on mode
+  let hourUTC: number;
+  if (mode === "twitter_today") {
+    hourUTC = CURRENT_EVENTS_HOURS_UTC[index] ?? CURRENT_EVENTS_HOURS_UTC[0];
+  } else if (mode === "twitter_policy_week") {
+    hourUTC = POLICY_MORNING_HOUR_UTC;
+  } else {
+    hourUTC = LINKEDIN_HOUR_UTC;
   }
 
-  // Find the next occurrence of targetDay from today
-  const today = new Date();
-  const currentDay = today.getDay();
-  let diff = targetDay - currentDay;
-  if (diff <= 0) diff += 7;
-  const target = new Date(today);
-  target.setDate(today.getDate() + diff);
-  target.setHours(9, 0, 0, 0);
-  return target.toISOString();
+  // Build the date in UTC
+  const year = targetDate.getFullYear();
+  const month = targetDate.getMonth();
+  const day = targetDate.getDate();
+  const scheduled = new Date(Date.UTC(year, month, day, hourUTC, 0, 0, 0));
+
+  return scheduled.toISOString();
+}
+
+function formatTimeEST(isoString: string): string {
+  const d = new Date(isoString);
+  // Convert UTC to EST (UTC-5)
+  const estHour = (d.getUTCHours() - 5 + 24) % 24;
+  const ampm = estHour >= 12 ? "PM" : "AM";
+  const displayHour = estHour === 0 ? 12 : estHour > 12 ? estHour - 12 : estHour;
+  return `${displayHour}:00 ${ampm} EST`;
 }
 
 export default function GeneratePage() {
@@ -85,6 +124,7 @@ export default function GeneratePage() {
   const [approving, setApproving] = useState<Set<number>>(new Set());
   const [approved, setApproved] = useState<Set<number>>(new Set());
   const [rejected, setRejected] = useState<Set<number>>(new Set());
+  const [approveErrors, setApproveErrors] = useState<Record<number, string>>({});
 
   useEffect(() => {
     if (!loading && !user) {
@@ -99,6 +139,7 @@ export default function GeneratePage() {
     setEditedContent({});
     setApproved(new Set());
     setRejected(new Set());
+    setApproveErrors({});
 
     const modeConfig: Record<GenerationMode, { platform: string; type?: string; count: number }> = {
       linkedin_week: { platform: "linkedin", count: 5 },
@@ -146,12 +187,21 @@ export default function GeneratePage() {
   const handleApprove = useCallback(
     async (index: number) => {
       const post = results[index];
-      if (!post || !session) return;
+      if (!post || !session) {
+        console.error("[approve] No post or session", { post: !!post, session: !!session });
+        return;
+      }
 
       setApproving((prev) => new Set(prev).add(index));
+      setApproveErrors((prev) => {
+        const next = { ...prev };
+        delete next[index];
+        return next;
+      });
 
       const platform = mode === "linkedin_week" ? "linkedin" : "twitter";
       const content = editedContent[index] ?? post.content;
+      const scheduledAt = getScheduledDate(mode, index, post.suggested_day);
 
       try {
         const res = await fetch("/api/posts", {
@@ -165,17 +215,26 @@ export default function GeneratePage() {
             platform,
             category: post.category,
             status: "approved",
-            scheduled_at: getScheduledDate(post.suggested_day),
+            scheduled_at: scheduledAt,
             policy_topic: post.policy_topic || null,
             news_reference: post.news_reference || null,
           }),
         });
 
-        if (res.ok) {
-          setApproved((prev) => new Set(prev).add(index));
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          const msg = data?.error || `Failed (${res.status})`;
+          console.error("[approve] API error:", msg);
+          setApproveErrors((prev) => ({ ...prev, [index]: msg }));
+          return;
         }
-      } catch {
-        // silent
+
+        console.log("[approve] Post approved successfully, index:", index);
+        setApproved((prev) => new Set(prev).add(index));
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Network error";
+        console.error("[approve] Fetch error:", msg);
+        setApproveErrors((prev) => ({ ...prev, [index]: msg }));
       } finally {
         setApproving((prev) => {
           const next = new Set(prev);
@@ -208,8 +267,8 @@ export default function GeneratePage() {
   }
 
   const platformColors: Record<string, string> = {
-    twitter: "border-sky-500/30",
-    linkedin: "border-blue-600/30",
+    twitter: "border-sky-500/30 bg-white/[0.02]",
+    linkedin: "border-blue-600/30 bg-white/[0.02]",
   };
 
   const visibleResults = results.filter((_, i) => !rejected.has(i));
@@ -300,6 +359,10 @@ export default function GeneratePage() {
               const platform = mode === "linkedin_week" ? "linkedin" : "twitter";
               const isApproved = approved.has(i);
               const isApproving = approving.has(i);
+              const approveError = approveErrors[i];
+              const scheduledTime = formatTimeEST(
+                getScheduledDate(mode, i, post.suggested_day)
+              );
 
               return (
                 <div
@@ -307,16 +370,19 @@ export default function GeneratePage() {
                   className={`border rounded-xl p-4 transition-all ${
                     isApproved
                       ? "border-green-500/30 bg-green-500/5"
-                      : platformColors[platform] || "border-white/[0.06]"
-                  } bg-white/[0.02]`}
+                      : platformColors[platform] || "border-white/[0.06] bg-white/[0.02]"
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {post.suggested_day && (
                         <span className="text-xs text-gray-500">
                           {post.suggested_day}
                         </span>
                       )}
+                      <span className="text-xs text-gray-500">
+                        {scheduledTime}
+                      </span>
                       <span className="text-xs text-gray-600">
                         {post.category}
                       </span>
@@ -352,6 +418,12 @@ export default function GeneratePage() {
                       </div>
                     )}
                   </div>
+
+                  {approveError && (
+                    <div className="mb-2 p-2 rounded-md bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                      Approve failed: {approveError}
+                    </div>
+                  )}
 
                   {isApproved ? (
                     <p className="text-sm text-gray-300 whitespace-pre-wrap">

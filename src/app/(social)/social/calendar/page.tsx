@@ -51,6 +51,37 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
+function formatTimeEST(isoString: string | null): string {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  const estHour = (d.getUTCHours() - 5 + 24) % 24;
+  const ampm = estHour >= 12 ? "PM" : "AM";
+  const displayHour = estHour === 0 ? 12 : estHour > 12 ? estHour - 12 : estHour;
+  return `${displayHour}:00 ${ampm}`;
+}
+
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Fallback for mobile/older browsers
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 export default function CalendarPage() {
   const { user, loading, session } = useSocialAuth();
   const router = useRouter();
@@ -58,7 +89,7 @@ export default function CalendarPage() {
   const [posts, setPosts] = useState<CalendarPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [selectedPost, setSelectedPost] = useState<CalendarPost | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [togglingPublish, setTogglingPublish] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -80,7 +111,6 @@ export default function CalendarPage() {
       );
       if (res.ok) {
         const data = await res.json();
-        // Only show approved, scheduled, and published posts
         const filtered = (data.posts || []).filter((p: CalendarPost) =>
           ["approved", "scheduled", "published"].includes(p.status)
         );
@@ -121,7 +151,6 @@ export default function CalendarPage() {
           setPosts((prev) =>
             prev.map((p) => (p.id === post.id ? { ...p, ...data.post } : p))
           );
-          // Also update the selected post if it's the one being toggled
           if (selectedPost?.id === post.id) {
             setSelectedPost((prev) => (prev ? { ...prev, status: newStatus } : null));
           }
@@ -139,13 +168,12 @@ export default function CalendarPage() {
     [session, selectedPost]
   );
 
-  async function handleCopy(content: string) {
-    try {
-      await navigator.clipboard.writeText(content);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback
+  async function handleCopy(postId: string, content: string, e?: React.MouseEvent) {
+    if (e) e.stopPropagation();
+    const ok = await copyToClipboard(content);
+    if (ok) {
+      setCopiedId(postId);
+      setTimeout(() => setCopiedId(null), 2000);
     }
   }
 
@@ -243,6 +271,8 @@ export default function CalendarPage() {
                     const borderColor = platformBorder[post.platform] || "border-l-gray-500";
                     const isPublished = post.status === "published";
                     const isToggling = togglingPublish.has(post.id);
+                    const isCopied = copiedId === post.id;
+                    const timeLabel = formatTimeEST(post.scheduled_at);
 
                     return (
                       <div
@@ -250,36 +280,54 @@ export default function CalendarPage() {
                         onClick={() => setSelectedPost(post)}
                         className={`group relative p-1.5 rounded-md bg-white/[0.03] border border-white/[0.06] border-l-2 ${borderColor} hover:bg-white/[0.06] cursor-pointer transition-colors`}
                       >
+                        {/* Row 1: badge + time + actions */}
                         <div className="flex items-center justify-between gap-1 mb-0.5">
-                          <span
-                            className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${badge.bg} ${badge.text}`}
-                          >
-                            {badge.label}
-                          </span>
-                          <button
-                            onClick={(e) => togglePublish(post, e)}
-                            disabled={isToggling}
-                            title={isPublished ? "Mark as unposted" : "Mark as posted"}
-                            className="transition-colors disabled:opacity-50"
-                          >
-                            {isToggling ? (
-                              <span className="w-3.5 h-3.5 border border-gray-500 border-t-transparent rounded-full animate-spin inline-block" />
-                            ) : isPublished ? (
-                              <CheckCircle className="w-3.5 h-3.5 text-green-400" />
-                            ) : (
-                              <Circle className="w-3.5 h-3.5 text-gray-500 group-hover:text-gray-400" />
+                          <div className="flex items-center gap-1">
+                            <span
+                              className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${badge.bg} ${badge.text}`}
+                            >
+                              {badge.label}
+                            </span>
+                            {timeLabel && (
+                              <span className="text-[9px] text-gray-500">
+                                {timeLabel}
+                              </span>
                             )}
-                          </button>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={(e) => handleCopy(post.id, post.content, e)}
+                              title={isCopied ? "Copied!" : "Copy content"}
+                              className="transition-colors"
+                            >
+                              {isCopied ? (
+                                <Check className="w-3.5 h-3.5 text-green-400" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5 text-gray-600 group-hover:text-gray-400" />
+                              )}
+                            </button>
+                            <button
+                              onClick={(e) => togglePublish(post, e)}
+                              disabled={isToggling}
+                              title={isPublished ? "Mark as unposted" : "Mark as posted"}
+                              className="transition-colors disabled:opacity-50"
+                            >
+                              {isToggling ? (
+                                <span className="w-3.5 h-3.5 border border-gray-500 border-t-transparent rounded-full animate-spin inline-block" />
+                              ) : isPublished ? (
+                                <CheckCircle className="w-3.5 h-3.5 text-green-400" />
+                              ) : (
+                                <Circle className="w-3.5 h-3.5 text-gray-500 group-hover:text-gray-400" />
+                              )}
+                            </button>
+                          </div>
                         </div>
+
+                        {/* Row 2: content preview */}
                         <p className="text-[10px] text-gray-400 line-clamp-2 leading-tight">
-                          {post.content.slice(0, 80)}
-                          {post.content.length > 80 ? "..." : ""}
+                          {post.content.slice(0, 100)}
+                          {post.content.length > 100 ? "..." : ""}
                         </p>
-                        {post.category && (
-                          <p className="text-[9px] text-gray-600 mt-0.5">
-                            {post.category.replace(/_/g, " ")}
-                          </p>
-                        )}
                       </div>
                     );
                   })
@@ -311,6 +359,11 @@ export default function CalendarPage() {
                     </span>
                   );
                 })()}
+                {selectedPost.scheduled_at && (
+                  <span className="text-xs text-gray-500">
+                    {formatTimeEST(selectedPost.scheduled_at)} EST
+                  </span>
+                )}
                 {selectedPost.category && (
                   <span className="text-xs text-gray-500">
                     {selectedPost.category.replace(/_/g, " ")}
@@ -361,10 +414,10 @@ export default function CalendarPage() {
               </button>
 
               <button
-                onClick={() => handleCopy(selectedPost.content)}
+                onClick={() => handleCopy(selectedPost.id, selectedPost.content)}
                 className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-[#4374BA] hover:bg-[#4374BA]/80 rounded-lg transition-colors"
               >
-                {copied ? (
+                {copiedId === selectedPost.id ? (
                   <>
                     <Check className="w-4 h-4" />
                     Copied!
