@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
     scheduled_at?: string | null;
     policy_topic?: string | null;
     news_reference?: string | null;
+    suggested_day?: string | null;
   };
 
   try {
@@ -88,6 +89,12 @@ export async function POST(request: NextRequest) {
     scheduledAt = tomorrow.toISOString();
   }
 
+  // Pack non-column fields into generation_metadata JSONB
+  const generationMetadata: Record<string, string | null> = {};
+  if (body.policy_topic) generationMetadata.policy_topic = body.policy_topic;
+  if (body.news_reference) generationMetadata.news_reference = body.news_reference;
+  if (body.suggested_day) generationMetadata.suggested_day = body.suggested_day;
+
   const { data, error } = await supabase
     .from("posts")
     .insert({
@@ -96,9 +103,8 @@ export async function POST(request: NextRequest) {
       post_category: body.post_category || null,
       status: body.status || "draft",
       scheduled_at: scheduledAt,
-      policy_topic: body.policy_topic || null,
-      news_reference: body.news_reference || null,
       generation_type: "ai_generated",
+      generation_metadata: Object.keys(generationMetadata).length > 0 ? generationMetadata : null,
       created_by: user.id,
     })
     .select()
