@@ -105,9 +105,22 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error("[social/api/posts] POST error:", error);
+    console.error("[social/api/posts] POST error:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      body: {
+        content: body.content?.slice(0, 50),
+        platform: body.platform,
+        category: body.category,
+        status: body.status,
+        scheduled_at: scheduledAt,
+        created_by: user.id,
+      },
+    });
     return NextResponse.json(
-      { error: "Failed to create post" },
+      { error: `Failed to create post: ${error.message}` },
       { status: 500 }
     );
   }

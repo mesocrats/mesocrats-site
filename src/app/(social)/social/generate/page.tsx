@@ -203,6 +203,18 @@ export default function GeneratePage() {
       const content = editedContent[index] ?? post.content;
       const scheduledAt = getScheduledDate(mode, index, post.suggested_day);
 
+      const requestBody = {
+        content,
+        platform,
+        category: post.category,
+        status: "approved",
+        scheduled_at: scheduledAt,
+        policy_topic: post.policy_topic || null,
+        news_reference: post.news_reference || null,
+      };
+
+      console.error("[approve] index:", index, "POST /api/posts", JSON.stringify(requestBody, null, 2));
+
       try {
         const res = await fetch("/api/posts", {
           method: "POST",
@@ -210,26 +222,18 @@ export default function GeneratePage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({
-            content,
-            platform,
-            category: post.category,
-            status: "approved",
-            scheduled_at: scheduledAt,
-            policy_topic: post.policy_topic || null,
-            news_reference: post.news_reference || null,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
+        const data = await res.json().catch(() => null);
+        console.error("[approve] Response:", res.status, JSON.stringify(data));
+
         if (!res.ok) {
-          const data = await res.json().catch(() => null);
           const msg = data?.error || `Failed (${res.status})`;
-          console.error("[approve] API error:", msg);
           setApproveErrors((prev) => ({ ...prev, [index]: msg }));
           return;
         }
 
-        console.log("[approve] Post approved successfully, index:", index);
         setApproved((prev) => new Set(prev).add(index));
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Network error";
