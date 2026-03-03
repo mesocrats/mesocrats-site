@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   let body: {
     content: string;
     platform: string;
-    category?: string | null;
+    post_category?: string | null;
     status?: string;
     scheduled_at?: string | null;
     policy_topic?: string | null;
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
     .insert({
       content: body.content,
       platform: body.platform,
-      category: body.category || null,
+      post_category: body.post_category || null,
       status: body.status || "draft",
       scheduled_at: scheduledAt,
       policy_topic: body.policy_topic || null,
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       body: {
         content: body.content?.slice(0, 50),
         platform: body.platform,
-        category: body.category,
+        post_category: body.post_category,
         status: body.status,
         scheduled_at: scheduledAt,
         created_by: user.id,

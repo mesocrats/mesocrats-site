@@ -34,7 +34,7 @@ export async function PATCH(
 
   let body: {
     content?: string;
-    category?: string | null;
+    post_category?: string | null;
     status?: string;
     scheduled_at?: string | null;
     rejection_reason?: string | null;
@@ -50,7 +50,7 @@ export async function PATCH(
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (body.content !== undefined) updates.content = body.content;
-  if (body.category !== undefined) updates.category = body.category;
+  if (body.post_category !== undefined) updates.post_category = body.post_category;
   if (body.status !== undefined) updates.status = body.status;
   if (body.scheduled_at !== undefined) updates.scheduled_at = body.scheduled_at;
   if (body.rejection_reason !== undefined) updates.rejection_reason = body.rejection_reason;
