@@ -15,6 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://developer.mesocrats.org"),
   title: {
     default:
       "PartyStack -- The Open Platform for American Political Technology",
@@ -22,6 +23,16 @@ export const metadata: Metadata = {
   },
   description:
     "PartyStack is the open platform for American political technology. APIs, SDKs, and prompt libraries to build compliant, transparent, and accessible tools for democracy.",
+  keywords: [
+    "PartyStack",
+    "political technology",
+    "FEC compliance",
+    "open source",
+    "political API",
+    "party formation",
+    "Mesocratic Party",
+  ],
+  robots: { index: true, follow: true },
   icons: {
     icon: [
       { url: "/developer/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -35,8 +46,24 @@ export const metadata: Metadata = {
       "Open-source APIs for FEC compliance, party formation, ballot access, and election calendars. Built by the Mesocratic National Committee.",
     url: "https://developer.mesocrats.org",
     siteName: "PartyStack",
-    images: [{ url: "/images/partystack-logo-og.png", width: 400, height: 326 }],
+    images: [
+      {
+        url: "/images/og-partystack.png",
+        width: 1200,
+        height: 630,
+        alt: "PartyStack -- The Open Platform for American Political Technology",
+      },
+    ],
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@mesocrats",
+    creator: "@mesocrats",
+    title: "PartyStack -- The Open Platform for American Political Technology",
+    description:
+      "Open-source APIs for FEC compliance, party formation, and ballot access. Built by the Mesocratic National Committee. MIT License.",
+    images: ["/images/og-partystack.png"],
   },
 };
 
