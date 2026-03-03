@@ -44,7 +44,7 @@ function Sidebar({
       <aside
         className={`
           fixed top-16 z-50 h-[calc(100vh-4rem)] w-60 overflow-y-auto
-          bg-[#0A0A15] border-r border-white/[0.06]
+          bg-[#101529] border-r border-white/[0.06]
           transition-transform duration-200
           lg:sticky lg:translate-x-0 lg:z-0
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -352,7 +352,7 @@ export default function ApiReferencePage() {
       {/* Main content area */}
       <div className="flex-1 flex flex-col lg:flex-row min-w-0">
         {/* Center column */}
-        <div className="flex-1 min-w-0 px-6 py-10 lg:px-8 lg:py-10 bg-[#0A0A15]">
+        <div className="flex-1 min-w-0 px-6 py-10 lg:px-8 lg:py-10 bg-[#101529]">
           <AuthCallout />
           <EndpointDetail endpoint={activeEndpoint} />
         </div>

@@ -53,7 +53,7 @@ export default function DeveloperLayout({
       <style>{`html,body{background:#0A0A15!important}`}</style>
       <AuthProviderWrapper>
         <DevNavBar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 bg-[#101529]">{children}</main>
         <DevFooter />
       </AuthProviderWrapper>
     </div>
