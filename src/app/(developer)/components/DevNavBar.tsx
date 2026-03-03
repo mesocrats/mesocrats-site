@@ -80,10 +80,10 @@ export default function DevNavBar() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-200 ${
+      className={`sticky top-0 z-50 bg-[#0A0A15] transition-[border-color,backdrop-filter] duration-200 ${
         scrolled
-          ? "bg-[#0A0A15]/80 backdrop-blur-xl border-b border-white/[0.06]"
-          : "bg-[#0A0A15]"
+          ? "backdrop-blur-xl border-b border-white/[0.06]"
+          : "border-b border-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
