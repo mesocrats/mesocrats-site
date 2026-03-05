@@ -48,13 +48,18 @@ export default function SocialNavBar() {
     <nav className="sticky top-0 z-50 bg-[#0B0F1A]/80 backdrop-blur-xl border-b border-white/[0.06]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
-          {/* Left: Brand */}
+          {/* Left: CivicBoom logo & name */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#4374BA] to-[#6C3393] flex items-center justify-center text-xs font-bold">
-              M
-            </div>
-            <span className="text-sm font-semibold text-white">
-              MNC Social
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/civicboom-logo-nav.png"
+              alt="CivicBoom logo"
+              width={30}
+              height={24}
+              className="h-6 w-auto"
+            />
+            <span className="text-lg font-extrabold text-white">
+              CivicBoom
             </span>
           </Link>
 
