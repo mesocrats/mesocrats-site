@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   },
   description:
     "Social media management platform for the Mesocratic National Committee.",
+  icons: {
+    icon: "/images/civicboom-favicon.png",
+    shortcut: "/images/civicboom-favicon.png",
+    apple: "/images/civicboom-favicon.png",
+  },
 };
 
 export default function SocialLayout({
