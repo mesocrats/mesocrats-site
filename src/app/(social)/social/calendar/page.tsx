@@ -9,7 +9,7 @@ interface CalendarPost {
   id: string;
   content: string;
   platform: string;
-  post_category: string | null;
+  category: string | null;
   status: string;
   scheduled_at: string | null;
   created_at: string;
@@ -364,9 +364,9 @@ export default function CalendarPage() {
                     {formatTimeEST(selectedPost.scheduled_at)} EST
                   </span>
                 )}
-                {selectedPost.post_category && (
+                {selectedPost.category && (
                   <span className="text-xs text-gray-500">
-                    {selectedPost.post_category.replace(/_/g, " ")}
+                    {selectedPost.category.replace(/_/g, " ")}
                   </span>
                 )}
                 <span

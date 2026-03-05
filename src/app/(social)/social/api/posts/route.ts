@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   let body: {
     content: string;
     platform: string;
-    post_category?: string | null;
+    category?: string | null;
     status?: string;
     scheduled_at?: string | null;
     policy_topic?: string | null;
@@ -94,18 +94,18 @@ export async function POST(request: NextRequest) {
   if (body.policy_topic) generationMetadata.policy_topic = body.policy_topic;
   if (body.news_reference) generationMetadata.news_reference = body.news_reference;
   if (body.suggested_day) generationMetadata.suggested_day = body.suggested_day;
+  generationMetadata.generation_type = "ai_generated";
+  generationMetadata.created_by = user.id;
 
   const { data, error } = await supabase
     .from("posts")
     .insert({
       content: body.content,
       platform: body.platform,
-      post_category: body.post_category || null,
+      category: body.category || null,
       status: body.status || "draft",
       scheduled_at: scheduledAt,
-      generation_type: "ai_generated",
-      generation_metadata: Object.keys(generationMetadata).length > 0 ? generationMetadata : null,
-      created_by: user.id,
+      generation_metadata: generationMetadata,
     })
     .select()
     .single();
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       body: {
         content: body.content?.slice(0, 50),
         platform: body.platform,
-        post_category: body.post_category,
+        category: body.category,
         status: body.status,
         scheduled_at: scheduledAt,
         created_by: user.id,

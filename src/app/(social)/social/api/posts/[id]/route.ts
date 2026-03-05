@@ -34,7 +34,7 @@ export async function PATCH(
 
   let body: {
     content?: string;
-    post_category?: string | null;
+    category?: string | null;
     status?: string;
     scheduled_at?: string | null;
     rejection_reason?: string | null;
@@ -50,10 +50,21 @@ export async function PATCH(
 
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (body.content !== undefined) updates.content = body.content;
-  if (body.post_category !== undefined) updates.post_category = body.post_category;
+  if (body.category !== undefined) updates.category = body.category;
   if (body.status !== undefined) updates.status = body.status;
   if (body.scheduled_at !== undefined) updates.scheduled_at = body.scheduled_at;
-  if (body.rejection_reason !== undefined) updates.rejection_reason = body.rejection_reason;
+
+  // Pack non-schema fields into generation_metadata
+  if (body.rejection_reason !== undefined) {
+    const { data: existing } = await supabase
+      .from("posts")
+      .select("generation_metadata")
+      .eq("id", id)
+      .single();
+    const meta = (existing?.generation_metadata as Record<string, unknown>) || {};
+    meta.rejection_reason = body.rejection_reason;
+    updates.generation_metadata = meta;
+  }
 
   // Status transition logic
   if (body.status === "published") {

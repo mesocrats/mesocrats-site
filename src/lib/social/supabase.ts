@@ -35,6 +35,16 @@ export type PostCategory =
   | "platform_feature"
   | "founder_story";
 
+export interface GenerationMetadata {
+  generation_type?: GenerationType;
+  created_by?: string;
+  policy_topic?: string | null;
+  news_reference?: string | null;
+  suggested_day?: string | null;
+  rejection_reason?: string | null;
+  [key: string]: unknown;
+}
+
 export interface Post {
   id: string;
   content: string;
@@ -43,14 +53,9 @@ export interface Post {
   status: PostStatus;
   scheduled_at: string | null;
   published_at: string | null;
-  image_url: string | null;
-  generation_type: GenerationType;
-  news_reference: string | null;
-  policy_topic: string | null;
-  rejection_reason: string | null;
   created_at: string;
   updated_at: string;
-  created_by: string;
+  generation_metadata: GenerationMetadata | null;
 }
 
 export interface PlatformConnection {

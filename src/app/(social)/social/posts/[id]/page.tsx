@@ -12,12 +12,15 @@ interface PostData {
   status: string;
   scheduled_at: string | null;
   published_at: string | null;
-  generation_type: string;
-  news_reference: string | null;
-  policy_topic: string | null;
-  rejection_reason: string | null;
   created_at: string;
   updated_at: string;
+  generation_metadata: {
+    generation_type?: string;
+    news_reference?: string | null;
+    policy_topic?: string | null;
+    rejection_reason?: string | null;
+    [key: string]: unknown;
+  } | null;
 }
 
 const categories = [
@@ -195,7 +198,7 @@ export default function EditPostPage() {
         <h1 className="text-2xl font-bold text-white">Edit Post</h1>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500">
-            {post.generation_type === "ai_generated" ? "AI Generated" : "Manual"}
+            {post.generation_metadata?.generation_type === "ai_generated" ? "AI Generated" : "Manual"}
           </span>
           <span className="text-xs text-gray-600">|</span>
           <span className="text-xs text-gray-500">{post.platform}</span>
@@ -271,16 +274,16 @@ export default function EditPostPage() {
       </div>
 
       {/* Meta info */}
-      {(post.policy_topic || post.news_reference) && (
+      {(post.generation_metadata?.policy_topic || post.generation_metadata?.news_reference) && (
         <div className="mb-6 p-3 bg-white/[0.02] border border-white/[0.04] rounded-lg">
-          {post.policy_topic && (
+          {post.generation_metadata?.policy_topic && (
             <p className="text-xs text-gray-500">
-              Policy topic: {post.policy_topic}
+              Policy topic: {post.generation_metadata.policy_topic}
             </p>
           )}
-          {post.news_reference && (
+          {post.generation_metadata?.news_reference && (
             <p className="text-xs text-gray-500 mt-1">
-              News reference: {post.news_reference}
+              News reference: {post.generation_metadata.news_reference}
             </p>
           )}
         </div>

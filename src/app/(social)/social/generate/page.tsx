@@ -206,7 +206,7 @@ export default function GeneratePage() {
       const requestBody = {
         content,
         platform,
-        post_category: post.category,
+        category: post.category,
         status: "approved",
         scheduled_at: scheduledAt,
         policy_topic: post.policy_topic || null,
