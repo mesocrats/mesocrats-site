@@ -8,6 +8,7 @@ import {
   isValidDate,
   clientIp,
 } from "../utils";
+import { deliverWebhook } from "../../../../../lib/mce/webhooks";
 
 // FEC individual contribution limits per year by committee type (cents)
 // 2025-2026 cycle
@@ -223,6 +224,20 @@ export async function POST(request: NextRequest) {
     newValue: contribution,
     ipAddress: clientIp(request),
   });
+
+  // ── Webhooks (fire and forget) ──────────────────────────────
+  void deliverWebhook(auth.committeeId, "contribution.created", { contribution });
+
+  // Alert if within $100 (10_000 cents) of FEC limit
+  const LIMIT_WARNING_THRESHOLD = 10_000;
+  if (limitCents !== null && newTotal >= limitCents - LIMIT_WARNING_THRESHOLD) {
+    void deliverWebhook(auth.committeeId, "contribution.limit_reached", {
+      contribution,
+      aggregate_ytd_cents: newTotal,
+      limit_cents: limitCents,
+      remaining_cents: limitCents - newTotal,
+    });
+  }
 
   return apiSuccess(
     {
