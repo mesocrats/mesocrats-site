@@ -2,6 +2,13 @@ import { NextRequest } from "next/server";
 import { createPartyStackClient } from "../../../lib/partystack-db";
 import { authenticateRequest, apiError, apiSuccess } from "../middleware";
 import { logAudit, isValidDate, clientIp } from "../utils";
+import { generateFECFile } from "../../../../../lib/mce";
+import type {
+  FecReport,
+  ScheduleALine,
+  ScheduleBLine,
+  ReportSummary,
+} from "../../../../../lib/mce";
 
 const VALID_REPORT_TYPES = [
   "quarterly",
@@ -117,5 +124,151 @@ export async function POST(request: NextRequest) {
     ipAddress: clientIp(request),
   });
 
-  return apiSuccess(report, 201);
+  // ── Phase 2: Generate .fec file from PartyStack data ────────
+  let fecGenerated = false;
+  let fecPreview: string | null = null;
+  let errorDetail: string | null = null;
+
+  try {
+    // Fetch contributions in coverage period (joined with contributors)
+    const { data: contributions, error: contribErr } = await ps
+      .from("contributions")
+      .select(`
+        id,
+        contributor_id,
+        amount_cents,
+        date_received,
+        aggregate_ytd_cents,
+        itemized,
+        contributors (
+          first_name,
+          last_name,
+          address_line1,
+          city,
+          state,
+          zip_code,
+          employer,
+          occupation
+        )
+      `)
+      .eq("committee_id", auth.committeeId)
+      .gte("date_received", coverageStart)
+      .lte("date_received", coverageEnd)
+      .order("date_received", { ascending: true });
+
+    if (contribErr) throw new Error(`Contributions query failed: ${contribErr.message}`);
+
+    // Fetch disbursements in coverage period
+    const { data: disbursements, error: disbErr } = await ps
+      .from("disbursements")
+      .select("*")
+      .eq("committee_id", auth.committeeId)
+      .gte("date", coverageStart)
+      .lte("date", coverageEnd)
+      .order("date", { ascending: true });
+
+    if (disbErr) throw new Error(`Disbursements query failed: ${disbErr.message}`);
+
+    if ((!contributions || contributions.length === 0) && (!disbursements || disbursements.length === 0)) {
+      throw new Error("No contributions or disbursements found in coverage period");
+    }
+
+    // Map contributions to ScheduleALine[] (itemized only)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scheduleA: ScheduleALine[] = (contributions || []).filter((c: any) => c.itemized).map((c: any) => {
+      const contributor = c.contributors;
+      return {
+        donorId: c.contributor_id,
+        donationId: c.id,
+        contributorName: contributor ? `${contributor.last_name}, ${contributor.first_name}` : "Unknown",
+        contributorAddress: contributor?.address_line1 || "",
+        contributorCity: contributor?.city || "",
+        contributorState: contributor?.state || "",
+        contributorZip: contributor?.zip_code || "",
+        employer: contributor?.employer || "",
+        occupation: contributor?.occupation || "",
+        dateReceived: c.date_received,
+        amountCents: c.amount_cents,
+        aggregateYtdCents: c.aggregate_ytd_cents || 0,
+      };
+    });
+
+    // Map disbursements to ScheduleBLine[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scheduleB: ScheduleBLine[] = (disbursements || []).map((d: any) => ({
+      disbursementId: d.id,
+      payeeName: d.payee_name,
+      payeeAddress: d.payee_address || "",
+      payeeCity: "",
+      payeeState: "",
+      payeeZip: "",
+      datePaid: d.date,
+      amountCents: d.amount_cents,
+      purpose: d.purpose,
+      category: d.category,
+    }));
+
+    // Build summary
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalReceiptsCents = (contributions || []).reduce((sum: number, c: any) => sum + c.amount_cents, 0);
+    const itemizedReceiptsCents = scheduleA.reduce((sum, l) => sum + l.amountCents, 0);
+    const totalDisbursementsCents = scheduleB.reduce((sum, l) => sum + l.amountCents, 0);
+
+    const disbursementsByCategory: Record<string, number> = {};
+    for (const d of scheduleB) {
+      disbursementsByCategory[d.category] = (disbursementsByCategory[d.category] || 0) + d.amountCents;
+    }
+
+    const summary: ReportSummary = {
+      totalReceiptsCents,
+      itemizedReceiptsCents,
+      unitemizedReceiptsCents: totalReceiptsCents - itemizedReceiptsCents,
+      totalDisbursementsCents,
+      disbursementsByCategory,
+      cashOnHandStartCents: null,
+      cashOnHandEndCents: null,
+    };
+
+    const year = parseInt(coverageStart.substring(0, 4), 10);
+
+    const fecReport: FecReport = {
+      period: {
+        type: "quarterly",
+        year,
+        period: reportType,
+        startDate: coverageStart,
+        endDate: coverageEnd,
+      },
+      scheduleA,
+      scheduleB,
+      summary,
+      warnings: [],
+      generatedAt: new Date().toISOString(),
+    };
+
+    const fecContent = generateFECFile(fecReport);
+
+    // Store .fec content on the report record
+    const { error: updateErr } = await ps
+      .from("reports")
+      .update({ fec_content: fecContent })
+      .eq("id", report.id);
+
+    if (updateErr) throw new Error(`Failed to store .fec content: ${updateErr.message}`);
+
+    fecGenerated = true;
+    fecPreview = fecContent.substring(0, 200);
+  } catch (err) {
+    errorDetail = err instanceof Error ? err.message : "FEC generation failed";
+  }
+
+  return apiSuccess(
+    {
+      ...report,
+      fec_generated: fecGenerated,
+      fec_preview: fecPreview,
+      ...(errorDetail ? { error_detail: errorDetail } : {}),
+    },
+    201
+  );
 }
