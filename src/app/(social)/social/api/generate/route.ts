@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     count: number;
     weekStart?: string;
     additionalContext?: string;
+    recent_posts?: string[];
   };
 
   try {
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
       count: body.count,
       weekStart: body.weekStart,
       additionalContext: body.additionalContext,
+      recentPosts: body.recent_posts,
     });
 
     // Log the generation

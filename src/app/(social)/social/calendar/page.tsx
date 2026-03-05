@@ -278,7 +278,11 @@ export default function CalendarPage() {
                       <div
                         key={post.id}
                         onClick={() => setSelectedPost(post)}
-                        className={`group relative p-1.5 rounded-md bg-white/[0.03] border border-white/[0.06] border-l-2 ${borderColor} hover:bg-white/[0.06] cursor-pointer transition-colors`}
+                        className={`group relative p-1.5 rounded-md border border-l-2 ${borderColor} cursor-pointer transition-colors ${
+                          isPublished
+                            ? "bg-green-500/5 border-green-500/20 hover:bg-green-500/10"
+                            : "bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.06]"
+                        }`}
                       >
                         {/* Row 1: badge + time + actions */}
                         <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -323,8 +327,18 @@ export default function CalendarPage() {
                           </div>
                         </div>
 
+                        {/* Published badge */}
+                        {isPublished && (
+                          <span className="inline-flex items-center gap-0.5 text-[8px] font-semibold text-green-400 bg-green-500/10 px-1 py-0.5 rounded mb-0.5">
+                            <Check className="w-2 h-2" />
+                            Published
+                          </span>
+                        )}
+
                         {/* Row 2: content preview */}
-                        <p className="text-[10px] text-gray-400 line-clamp-2 leading-tight">
+                        <p className={`text-[10px] line-clamp-2 leading-tight ${
+                          isPublished ? "text-gray-500" : "text-gray-400"
+                        }`}>
                           {post.content.slice(0, 100)}
                           {post.content.length > 100 ? "..." : ""}
                         </p>

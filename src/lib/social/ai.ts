@@ -18,9 +18,15 @@ interface GenerateOptions {
   count: number;
   weekStart?: string;
   additionalContext?: string;
+  recentPosts?: string[];
 }
 
-function buildSystemPrompt(): string {
+function buildSystemPrompt(recentPosts?: string[]): string {
+  const recentSection =
+    recentPosts && recentPosts.length > 0
+      ? `\n\n---\n\nRecent posts to avoid repeating themes:\n${recentPosts.map((p, i) => `${i + 1}. ${p.slice(0, 200)}`).join("\n")}\n\nDo NOT repeat the same topics, angles, or talking points as the posts above. Find fresh angles and new subjects.`
+      : "";
+
   return `${MESOCRATIC_REFERENCE_GUIDE}
 
 ---
@@ -36,7 +42,7 @@ GOOD: "Our vision for this party started 15 years ago."
 
 Maintain the brand voice: direct, confident, warm, grounded. Follow the Issue Framework for political content. Respect both parties. Never attack.
 
-Return your response as a JSON array of post objects. Output ONLY valid JSON -- no markdown fencing, no commentary.`;
+Return your response as a JSON array of post objects. Output ONLY valid JSON -- no markdown fencing, no commentary.${recentSection}`;
 }
 
 function buildUserPrompt(options: GenerateOptions): string {
@@ -116,7 +122,7 @@ export async function generatePosts(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("Missing ANTHROPIC_API_KEY");
 
-  const systemPrompt = buildSystemPrompt();
+  const systemPrompt = buildSystemPrompt(options.recentPosts);
   const userPrompt = buildUserPrompt(options);
 
   const useWebSearch =
