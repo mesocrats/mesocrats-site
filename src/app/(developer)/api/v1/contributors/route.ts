@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createPartyStackClient } from "../../../lib/partystack-db";
-import { authenticateRequest, apiError, apiSuccess } from "../middleware";
+import { authenticateRequest, apiError, apiSuccess, setRateLimitHeaders } from "../middleware";
 import { parsePagination, paginationMeta, logAudit, clientIp } from "../utils";
 
 /**
@@ -8,7 +8,7 @@ import { parsePagination, paginationMeta, logAudit, clientIp } from "../utils";
  */
 export async function GET(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   const { searchParams } = new URL(request.url);
   const { page, limit, offset } = parsePagination(searchParams);
@@ -31,15 +31,13 @@ export async function GET(request: NextRequest) {
 
   const { data, error, count } = await query;
 
-  if (error) return apiError(error.message, 500);
+  if (error) return apiError(error.message, 500, auth.rateLimit);
 
-  return new Response(
-    JSON.stringify({
-      data,
-      pagination: paginationMeta(page, limit, count ?? 0),
-    }),
-    { status: 200, headers: { "Content-Type": "application/json" } }
+  const res = NextResponse.json(
+    { data, pagination: paginationMeta(page, limit, count ?? 0) },
+    { status: 200 }
   );
+  return setRateLimitHeaders(res, auth.rateLimit);
 }
 
 /**
@@ -47,7 +45,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   let body: Record<string, unknown>;
   try {
@@ -60,7 +58,7 @@ export async function POST(request: NextRequest) {
   const lastName = ((body.last_name as string) || "").trim();
 
   if (!firstName || !lastName) {
-    return apiError("first_name and last_name are required", 400);
+    return apiError("first_name and last_name are required", 400, auth.rateLimit);
   }
 
   const fullName =
@@ -96,7 +94,7 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return apiError(error.message, 500);
+  if (error) return apiError(error.message, 500, auth.rateLimit);
 
   logAudit(ps, {
     committeeId: auth.committeeId,
@@ -108,5 +106,5 @@ export async function POST(request: NextRequest) {
     ipAddress: clientIp(request),
   });
 
-  return apiSuccess(contributor, 201);
+  return apiSuccess(contributor, 201, auth.rateLimit);
 }

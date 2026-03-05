@@ -23,7 +23,7 @@ const VALID_REPORT_TYPES = [
  */
 export async function GET(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status");
@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await query;
 
-  if (error) return apiError(error.message, 500);
+  if (error) return apiError(error.message, 500, auth.rateLimit);
 
-  return apiSuccess(data);
+  return apiSuccess(data, 200, auth.rateLimit);
 }
 
 /**
@@ -52,13 +52,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   let body: Record<string, unknown>;
   try {
     body = await request.json();
   } catch {
-    return apiError("Invalid JSON body", 400);
+    return apiError("Invalid JSON body", 400, auth.rateLimit);
   }
 
   const coverageStart = ((body.coverage_start as string) || "").trim();
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (errors.length > 0) {
-    return apiError(errors.join("; "), 400);
+    return apiError(errors.join("; "), 400, auth.rateLimit);
   }
 
   const ps = createPartyStackClient();
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return apiError(error.message, 500);
+  if (error) return apiError(error.message, 500, auth.rateLimit);
 
   logAudit(ps, {
     committeeId: auth.committeeId,
@@ -269,6 +269,7 @@ export async function POST(request: NextRequest) {
       fec_preview: fecPreview,
       ...(errorDetail ? { error_detail: errorDetail } : {}),
     },
-    201
+    201,
+    auth.rateLimit
   );
 }

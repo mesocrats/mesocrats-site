@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   const { id } = await params;
 
@@ -23,8 +23,8 @@ export async function GET(
     .single();
 
   if (error || !contribution) {
-    return apiError("Contribution not found", 404);
+    return apiError("Contribution not found", 404, auth.rateLimit);
   }
 
-  return apiSuccess(contribution);
+  return apiSuccess(contribution, 200, auth.rateLimit);
 }

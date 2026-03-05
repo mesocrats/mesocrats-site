@@ -41,7 +41,7 @@ const LIMITS: Record<
  */
 export async function GET(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   const ps = createPartyStackClient();
   const { data: committee, error } = await ps
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     .eq("id", auth.committeeId)
     .single();
 
-  if (error) return apiError(error.message, 500);
+  if (error) return apiError(error.message, 500, auth.rateLimit);
 
   const type = committee.committee_type as string;
   const limits = LIMITS[type] || LIMITS.pac;
@@ -60,5 +60,5 @@ export async function GET(request: NextRequest) {
     cycle: "2025-2026",
     limits,
     itemization_threshold: 20_000,
-  });
+  }, 200, auth.rateLimit);
 }

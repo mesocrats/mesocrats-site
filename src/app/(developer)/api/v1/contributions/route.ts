@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createPartyStackClient } from "../../../lib/partystack-db";
-import { authenticateRequest, apiError, apiSuccess } from "../middleware";
+import { authenticateRequest, apiError, apiSuccess, setRateLimitHeaders } from "../middleware";
 import {
   parsePagination,
   paginationMeta,
@@ -26,7 +26,7 @@ const ITEMIZATION_THRESHOLD = 20_000; // $200 in cents
  */
 export async function GET(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   const { searchParams } = new URL(request.url);
   const { page, limit, offset } = parsePagination(searchParams);
@@ -52,15 +52,13 @@ export async function GET(request: NextRequest) {
 
   const { data, error, count } = await query;
 
-  if (error) return apiError(error.message, 500);
+  if (error) return apiError(error.message, 500, auth.rateLimit);
 
-  return new Response(
-    JSON.stringify({
-      data,
-      pagination: paginationMeta(page, limit, count ?? 0),
-    }),
-    { status: 200, headers: { "Content-Type": "application/json" } }
+  const res = NextResponse.json(
+    { data, pagination: paginationMeta(page, limit, count ?? 0) },
+    { status: 200 }
   );
+  return setRateLimitHeaders(res, auth.rateLimit);
 }
 
 /**
@@ -68,7 +66,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const auth = await authenticateRequest(request);
-  if ("error" in auth) return apiError(auth.error, auth.status);
+  if ("error" in auth) return apiError(auth.error, auth.status, auth.rateLimit);
 
   let body: Record<string, unknown>;
   try {
@@ -89,7 +87,7 @@ export async function POST(request: NextRequest) {
   if (!dateReceived || !isValidDate(dateReceived))
     errors.push("date_received is required and must be YYYY-MM-DD");
 
-  if (errors.length > 0) return apiError(errors.join("; "), 400);
+  if (errors.length > 0) return apiError(errors.join("; "), 400, auth.rateLimit);
 
   const ps = createPartyStackClient();
 
@@ -104,7 +102,8 @@ export async function POST(request: NextRequest) {
   if (contribErr || !contributor) {
     return apiError(
       "contributor_id not found or does not belong to this committee",
-      404
+      404,
+      auth.rateLimit
     );
   }
 
@@ -115,7 +114,7 @@ export async function POST(request: NextRequest) {
     .eq("id", auth.committeeId)
     .single();
 
-  if (cmtErr || !committee) return apiError("Committee not found", 500);
+  if (cmtErr || !committee) return apiError("Committee not found", 500, auth.rateLimit);
 
   const calendarYear = new Date(dateReceived).getFullYear();
 
@@ -152,7 +151,8 @@ export async function POST(request: NextRequest) {
     return apiError(
       `Contribution would exceed the FEC individual limit of ${limitDollars}/year for ${committee.committee_type} committees. ` +
         `Current YTD aggregate: ${currentDollars}. Attempted: ${attemptDollars}.`,
-      422
+      422,
+      auth.rateLimit
     );
   }
 
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (insertErr) return apiError(insertErr.message, 500);
+  if (insertErr) return apiError(insertErr.message, 500, auth.rateLimit);
 
   // ── Upsert aggregate ─────────────────────────────────────
   if (existingAgg) {
@@ -234,6 +234,7 @@ export async function POST(request: NextRequest) {
         itemization_required: itemized,
       },
     },
-    201
+    201,
+    auth.rateLimit
   );
 }
