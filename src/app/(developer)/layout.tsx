@@ -77,7 +77,7 @@ export default function DeveloperLayout({
       className={`${dmSans.variable} ${jetbrainsMono.variable} font-dev-sans bg-[#0A0A15] text-white min-h-screen flex flex-col`}
     >
       {/* Override html/body background to prevent white flash during overscroll */}
-      <style>{`html,body{background:#0A0A15!important}`}</style>
+      <style>{`html,body{background:#101529!important}`}</style>
       <AuthProviderWrapper>
         <DevNavBar />
         <main className="flex-1 bg-[#101529]">{children}</main>
