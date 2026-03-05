@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Check, Circle, CheckCircle, X } from "lucide-react";
+import { Copy, Check, Circle, CheckCircle, X, Plus } from "lucide-react";
 import { useSocialAuth } from "../../components/SocialAuthProvider";
 
 interface CalendarPost {
@@ -28,6 +28,14 @@ const platformBorder: Record<string, string> = {
   linkedin: "border-l-[#4374BA]",
   instagram: "border-l-[#6C3393]",
 };
+
+const TWITTER_TIME_SLOTS = [
+  { label: "7:00 AM EST", hourUTC: 12 },
+  { label: "10:00 AM EST", hourUTC: 15 },
+  { label: "1:00 PM EST", hourUTC: 18 },
+];
+
+const LINKEDIN_TIME_SLOT = { label: "9:00 AM EST", hourUTC: 14 };
 
 function getWeekDates(offset: number): Date[] {
   const today = new Date();
@@ -65,7 +73,6 @@ async function copyToClipboard(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    // Fallback for mobile/older browsers
     try {
       const textarea = document.createElement("textarea");
       textarea.value = text;
@@ -91,6 +98,19 @@ export default function CalendarPage() {
   const [selectedPost, setSelectedPost] = useState<CalendarPost | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [togglingPublish, setTogglingPublish] = useState<Set<string>>(new Set());
+
+  // Edit modal state
+  const [editContent, setEditContent] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // New post modal state
+  const [newPostDate, setNewPostDate] = useState<Date | null>(null);
+  const [newPostPlatform, setNewPostPlatform] = useState<"linkedin" | "twitter">("twitter");
+  const [newPostTimeSlot, setNewPostTimeSlot] = useState(0);
+  const [newPostContent, setNewPostContent] = useState("");
+  const [newPostSaving, setNewPostSaving] = useState(false);
+  const [newPostError, setNewPostError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -126,6 +146,42 @@ export default function CalendarPage() {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  // Open detail modal
+  function openPostDetail(post: CalendarPost) {
+    setSelectedPost(post);
+    setEditContent(post.content);
+    setSaved(false);
+  }
+
+  // Save edited content
+  async function handleSaveEdit() {
+    if (!selectedPost || !session) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/posts/${selectedPost.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ content: editContent }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPosts((prev) =>
+          prev.map((p) => (p.id === selectedPost.id ? { ...p, ...data.post } : p))
+        );
+        setSelectedPost((prev) => (prev ? { ...prev, content: editContent } : null));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    } catch {
+      // silent
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const togglePublish = useCallback(
     async (post: CalendarPost, e: React.MouseEvent) => {
@@ -174,6 +230,69 @@ export default function CalendarPage() {
     if (ok) {
       setCopiedId(postId);
       setTimeout(() => setCopiedId(null), 2000);
+    }
+  }
+
+  // New post modal
+  function openNewPostModal(date: Date) {
+    setNewPostDate(date);
+    setNewPostPlatform("twitter");
+    setNewPostTimeSlot(0);
+    setNewPostContent("");
+    setNewPostError(null);
+  }
+
+  async function handleCreatePost() {
+    if (!newPostDate || !session || !newPostContent.trim()) return;
+    setNewPostSaving(true);
+    setNewPostError(null);
+
+    const hourUTC =
+      newPostPlatform === "linkedin"
+        ? LINKEDIN_TIME_SLOT.hourUTC
+        : TWITTER_TIME_SLOTS[newPostTimeSlot]?.hourUTC ?? 12;
+
+    const scheduled = new Date(
+      Date.UTC(
+        newPostDate.getFullYear(),
+        newPostDate.getMonth(),
+        newPostDate.getDate(),
+        hourUTC,
+        0,
+        0
+      )
+    );
+
+    try {
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          content: newPostContent.trim(),
+          platform: newPostPlatform,
+          category: newPostPlatform === "linkedin" ? "tech_story" : "current_events",
+          status: "approved",
+          scheduled_at: scheduled.toISOString(),
+          platform_post_id: null,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setNewPostError(data?.error || `Failed (${res.status})`);
+        return;
+      }
+
+      const data = await res.json();
+      setPosts((prev) => [...prev, data.post]);
+      setNewPostDate(null);
+    } catch (err) {
+      setNewPostError(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setNewPostSaving(false);
     }
   }
 
@@ -246,6 +365,13 @@ export default function CalendarPage() {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-500">{DAYS[i]}</span>
                 <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => openNewPostModal(date)}
+                    title="Add post"
+                    className="w-4 h-4 flex items-center justify-center rounded bg-white/[0.06] hover:bg-white/[0.12] text-gray-500 hover:text-white transition-colors"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
                   {dayPosts.length > 0 && (
                     <span className="text-[9px] font-medium text-gray-500 bg-white/[0.06] px-1.5 py-0.5 rounded-full">
                       {dayPosts.length}
@@ -277,7 +403,7 @@ export default function CalendarPage() {
                     return (
                       <div
                         key={post.id}
-                        onClick={() => setSelectedPost(post)}
+                        onClick={() => openPostDetail(post)}
                         className={`group relative p-1.5 rounded-md border border-l-2 ${borderColor} cursor-pointer transition-colors ${
                           isPublished
                             ? "bg-green-500/5 border-green-500/20 hover:bg-green-500/10"
@@ -352,7 +478,7 @@ export default function CalendarPage() {
         })}
       </div>
 
-      {/* Post Detail Modal */}
+      {/* Post Detail / Edit Modal */}
       {selectedPost && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
@@ -401,46 +527,213 @@ export default function CalendarPage() {
               </button>
             </div>
 
-            {/* Modal body */}
+            {/* Modal body — editable */}
             <div className="p-4 overflow-y-auto flex-1">
-              <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
-                {selectedPost.content}
-              </p>
+              <textarea
+                value={editContent}
+                onChange={(e) => {
+                  setEditContent(e.target.value);
+                  setSaved(false);
+                }}
+                rows={Math.max(5, editContent.split("\n").length + 2)}
+                className="w-full bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-gray-200 leading-relaxed focus:outline-none focus:border-[#4374BA]/50 resize-y"
+              />
             </div>
 
             {/* Modal footer */}
             <div className="flex items-center justify-between p-4 border-t border-white/[0.06]">
-              <button
-                onClick={(e) => togglePublish(selectedPost, e)}
-                disabled={togglingPublish.has(selectedPost.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                  selectedPost.status === "published"
-                    ? "border-green-500/30 text-green-400 hover:bg-green-500/10"
-                    : "border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.04]"
-                }`}
-              >
-                {selectedPost.status === "published" ? (
-                  <CheckCircle className="w-4 h-4" />
-                ) : (
-                  <Circle className="w-4 h-4" />
-                )}
-                {selectedPost.status === "published" ? "Posted" : "Mark as Posted"}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => togglePublish(selectedPost, e)}
+                  disabled={togglingPublish.has(selectedPost.id)}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                    selectedPost.status === "published"
+                      ? "border-green-500/30 text-green-400 hover:bg-green-500/10"
+                      : "border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                  }`}
+                >
+                  {selectedPost.status === "published" ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <Circle className="w-4 h-4" />
+                  )}
+                  {selectedPost.status === "published" ? "Posted" : "Mark as Posted"}
+                </button>
 
+                <button
+                  onClick={() => handleCopy(selectedPost.id, editContent)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-lg hover:bg-white/[0.04] transition-colors"
+                >
+                  {copiedId === selectedPost.id ? (
+                    <>
+                      <Check className="w-4 h-4 text-green-400" />
+                      <span className="text-green-400">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Copy
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {saved && (
+                  <span className="flex items-center gap-1 text-xs text-green-400">
+                    <Check className="w-3 h-3" />
+                    Saved
+                  </span>
+                )}
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={saving || editContent === selectedPost.content}
+                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-[#4374BA] hover:bg-[#4374BA]/80 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {saving ? (
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Post Modal */}
+      {newPostDate && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={() => setNewPostDate(null)}
+        >
+          <div
+            className="w-full max-w-md bg-[#0B0F1A] border border-white/[0.1] rounded-2xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/[0.06]">
+              <div>
+                <h3 className="text-sm font-semibold text-white">New Post</h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {newPostDate.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
               <button
-                onClick={() => handleCopy(selectedPost.id, selectedPost.content)}
-                className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-[#4374BA] hover:bg-[#4374BA]/80 rounded-lg transition-colors"
+                onClick={() => setNewPostDate(null)}
+                className="text-gray-500 hover:text-white transition-colors"
               >
-                {copiedId === selectedPost.id ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Copied!
-                  </>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-4 space-y-4">
+              {/* Platform selector */}
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Platform</label>
+                <div className="flex gap-2">
+                  {(["twitter", "linkedin"] as const).map((p) => {
+                    const badge = platformBadge[p];
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => {
+                          setNewPostPlatform(p);
+                          setNewPostTimeSlot(0);
+                        }}
+                        className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                          newPostPlatform === p
+                            ? "border-[#4374BA]/50 bg-[#4374BA]/10 text-white"
+                            : "border-white/[0.08] text-gray-400 hover:text-white hover:border-white/[0.15]"
+                        }`}
+                      >
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${badge.bg} ${badge.text}`}>
+                          {badge.label}
+                        </span>
+                        {p === "twitter" ? "Twitter / X" : "LinkedIn"}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Time slot selector */}
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Time Slot</label>
+                {newPostPlatform === "twitter" ? (
+                  <div className="flex gap-2">
+                    {TWITTER_TIME_SLOTS.map((slot, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setNewPostTimeSlot(idx)}
+                        className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+                          newPostTimeSlot === idx
+                            ? "border-[#4374BA]/50 bg-[#4374BA]/10 text-white"
+                            : "border-white/[0.08] text-gray-400 hover:text-white hover:border-white/[0.15]"
+                        }`}
+                      >
+                        {slot.label}
+                      </button>
+                    ))}
+                  </div>
                 ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    Copy
-                  </>
+                  <div className="px-3 py-1.5 text-xs text-gray-400 border border-white/[0.08] rounded-lg inline-block">
+                    {LINKEDIN_TIME_SLOT.label}
+                  </div>
+                )}
+              </div>
+
+              {/* Content */}
+              <div>
+                <label className="block text-xs text-gray-400 mb-2">Content</label>
+                <textarea
+                  value={newPostContent}
+                  onChange={(e) => setNewPostContent(e.target.value)}
+                  placeholder={
+                    newPostPlatform === "twitter"
+                      ? "Write your tweet (280 chars max)..."
+                      : "Write your LinkedIn post..."
+                  }
+                  rows={5}
+                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#4374BA]/50 resize-y"
+                />
+                {newPostPlatform === "twitter" && (
+                  <p className={`text-xs mt-1 ${
+                    newPostContent.length > 280 ? "text-red-400" : "text-gray-500"
+                  }`}>
+                    {newPostContent.length}/280
+                  </p>
+                )}
+              </div>
+
+              {/* Error */}
+              {newPostError && (
+                <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                  {newPostError}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-white/[0.06]">
+              <button
+                onClick={handleCreatePost}
+                disabled={newPostSaving || !newPostContent.trim()}
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#6C3393] to-[#4374BA] rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {newPostSaving ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </span>
+                ) : (
+                  "Add to Calendar"
                 )}
               </button>
             </div>
