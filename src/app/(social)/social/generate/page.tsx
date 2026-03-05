@@ -6,13 +6,11 @@ import { Check, X } from "lucide-react";
 import { useSocialAuth } from "../../components/SocialAuthProvider";
 import ModeSelector, {
   type ModeSelection,
-  type PlatformChoice,
   getRemainingWeekdays,
   computeScheduledAt,
   formatTimeEST,
   getAPIPlatform,
   getAPIType,
-  TIME_SLOTS,
 } from "./ModeSelector";
 
 interface GeneratedPost {
