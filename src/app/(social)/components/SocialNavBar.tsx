@@ -56,7 +56,7 @@ export default function SocialNavBar() {
               alt="CivicBoom logo"
               width={30}
               height={24}
-              className="h-9 w-auto"
+              className="h-[54px] w-auto"
             />
             <span className="text-lg font-extrabold text-white">
               CivicBoom
