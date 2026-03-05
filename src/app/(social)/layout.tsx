@@ -10,8 +10,8 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Social Portal -- Mesocratic National Committee",
-    template: "%s | MNC Social",
+    default: "CivicBoom",
+    template: "%s | CivicBoom",
   },
   description:
     "Social media management platform for the Mesocratic National Committee.",
