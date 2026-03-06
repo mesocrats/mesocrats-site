@@ -411,12 +411,7 @@ export default function CalendarPage() {
                   >
                     <Plus className="w-3 h-3" />
                   </button>
-                  {dayPosts.length > 0 && (
-                    <span className="text-[9px] font-medium text-gray-500 bg-white/[0.06] px-1.5 py-0.5 rounded-full">
-                      {dayPosts.length}
-                    </span>
-                  )}
-                  <span
+<span
                     className={`text-xs font-medium ${
                       isToday ? "text-[#4374BA]" : "text-gray-400"
                     }`}
