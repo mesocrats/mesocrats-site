@@ -12,7 +12,7 @@ export interface ModeSelection {
   scope: ScopeChoice;
   /** For single-post: the target date (ISO string, date only) */
   singleDate?: string;
-  /** For twitter_today single: the time slot index (0=7am, 1=10am, 2=1pm EST) */
+  /** For twitter_today single: the time slot index (0=10am, 1=1pm, 2=4pm EST) */
   singleTimeSlot?: number;
 }
 
@@ -50,16 +50,16 @@ const PLATFORMS: {
     label: "Twitter \u2014 Today's Tweets",
     description: "Respond to today's news",
     fullLabel: "Full Day",
-    fullDesc: "3 tweets for today (7am, 10am, 1pm EST)",
+    fullDesc: "3 tweets for today (10am, 1pm, 4pm EST)",
     singleLabel: "Single Tweet",
     singleDesc: "1 tweet, pick the time slot",
   },
 ];
 
 const TIME_SLOTS = [
-  { label: "7:00 AM EST", hour: 12 },
   { label: "10:00 AM EST", hour: 15 },
   { label: "1:00 PM EST", hour: 18 },
+  { label: "4:00 PM EST", hour: 21 },
 ];
 
 // --- Helpers ---

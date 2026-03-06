@@ -30,9 +30,9 @@ const platformBorder: Record<string, string> = {
 };
 
 const TWITTER_TIME_SLOTS = [
-  { label: "7:00 AM EST", hourUTC: 12 },
   { label: "10:00 AM EST", hourUTC: 15 },
   { label: "1:00 PM EST", hourUTC: 18 },
+  { label: "4:00 PM EST", hourUTC: 21 },
 ];
 
 const LINKEDIN_TIME_SLOT = { label: "9:00 AM EST", hourUTC: 14 };
