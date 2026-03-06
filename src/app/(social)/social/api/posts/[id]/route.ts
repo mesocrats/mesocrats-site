@@ -38,6 +38,7 @@ export async function PATCH(
     status?: string;
     scheduled_at?: string | null;
     rejection_reason?: string | null;
+    generation_metadata?: Record<string, unknown>;
   };
 
   try {
@@ -53,6 +54,17 @@ export async function PATCH(
   if (body.category !== undefined) updates.category = body.category;
   if (body.status !== undefined) updates.status = body.status;
   if (body.scheduled_at !== undefined) updates.scheduled_at = body.scheduled_at;
+
+  // Direct generation_metadata merge
+  if (body.generation_metadata !== undefined) {
+    const { data: existing } = await supabase
+      .from("posts")
+      .select("generation_metadata")
+      .eq("id", id)
+      .single();
+    const meta = (existing?.generation_metadata as Record<string, unknown>) || {};
+    updates.generation_metadata = { ...meta, ...body.generation_metadata };
+  }
 
   // Pack non-schema fields into generation_metadata
   if (body.rejection_reason !== undefined) {

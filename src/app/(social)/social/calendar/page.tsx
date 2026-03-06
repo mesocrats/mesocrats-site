@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Check, Circle, CheckCircle, X, Plus } from "lucide-react";
+import { Copy, Check, Circle, CheckCircle, X, Plus, Trash2 } from "lucide-react";
 import { useSocialAuth } from "../../components/SocialAuthProvider";
 
 interface CalendarPost {
@@ -111,6 +111,10 @@ export default function CalendarPage() {
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostSaving, setNewPostSaving] = useState(false);
   const [newPostError, setNewPostError] = useState<string | null>(null);
+
+  // Delete state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -230,6 +234,41 @@ export default function CalendarPage() {
     if (ok) {
       setCopiedId(postId);
       setTimeout(() => setCopiedId(null), 2000);
+    }
+  }
+
+  async function handleDeletePost() {
+    if (!selectedPost || !session) return;
+    setDeleting(true);
+    try {
+      // Mark generation metadata as available for reuse before deleting
+      await fetch(`/api/posts/${selectedPost.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          generation_metadata: { deleted_for_reuse: true, deleted_at: new Date().toISOString() },
+        }),
+      });
+
+      const res = await fetch(`/api/posts/${selectedPost.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (res.ok) {
+        setPosts((prev) => prev.filter((p) => p.id !== selectedPost.id));
+        setSelectedPost(null);
+        setShowDeleteConfirm(false);
+      }
+    } catch {
+      // silent
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -482,7 +521,7 @@ export default function CalendarPage() {
       {selectedPost && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-          onClick={() => setSelectedPost(null)}
+          onClick={() => { setSelectedPost(null); setShowDeleteConfirm(false); }}
         >
           <div
             className="w-full max-w-lg bg-[#0B0F1A] border border-white/[0.1] rounded-2xl shadow-2xl max-h-[80vh] flex flex-col"
@@ -520,7 +559,7 @@ export default function CalendarPage() {
                 </span>
               </div>
               <button
-                onClick={() => setSelectedPost(null)}
+                onClick={() => { setSelectedPost(null); setShowDeleteConfirm(false); }}
                 className="text-gray-500 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -541,62 +580,98 @@ export default function CalendarPage() {
             </div>
 
             {/* Modal footer */}
-            <div className="flex items-center justify-between p-4 border-t border-white/[0.06]">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => togglePublish(selectedPost, e)}
-                  disabled={togglingPublish.has(selectedPost.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
-                    selectedPost.status === "published"
-                      ? "border-green-500/30 text-green-400 hover:bg-green-500/10"
-                      : "border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.04]"
-                  }`}
-                >
-                  {selectedPost.status === "published" ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : (
-                    <Circle className="w-4 h-4" />
-                  )}
-                  {selectedPost.status === "published" ? "Posted" : "Mark as Posted"}
-                </button>
-
-                <button
-                  onClick={() => handleCopy(selectedPost.id, editContent)}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-lg hover:bg-white/[0.04] transition-colors"
-                >
-                  {copiedId === selectedPost.id ? (
-                    <>
-                      <Check className="w-4 h-4 text-green-400" />
-                      <span className="text-green-400">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      Copy
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {saved && (
-                  <span className="flex items-center gap-1 text-xs text-green-400">
-                    <Check className="w-3 h-3" />
-                    Saved
+            <div className="p-4 border-t border-white/[0.06]">
+              {showDeleteConfirm ? (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-red-400">
+                    Delete this post? This cannot be undone.
                   </span>
-                )}
-                <button
-                  onClick={handleSaveEdit}
-                  disabled={saving || editContent === selectedPost.content}
-                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-[#4374BA] hover:bg-[#4374BA]/80 rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {saving ? (
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    "Save"
-                  )}
-                </button>
-              </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-lg hover:bg-white/[0.04] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeletePost}
+                      disabled={deleting}
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {deleting ? (
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        "Yes, Delete"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                    <button
+                      onClick={(e) => togglePublish(selectedPost, e)}
+                      disabled={togglingPublish.has(selectedPost.id)}
+                      className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+                        selectedPost.status === "published"
+                          ? "border-green-500/30 text-green-400 hover:bg-green-500/10"
+                          : "border-white/[0.08] text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                      }`}
+                    >
+                      {selectedPost.status === "published" ? (
+                        <CheckCircle className="w-4 h-4" />
+                      ) : (
+                        <Circle className="w-4 h-4" />
+                      )}
+                      {selectedPost.status === "published" ? "Posted" : "Mark as Posted"}
+                    </button>
+
+                    <button
+                      onClick={() => handleCopy(selectedPost.id, editContent)}
+                      className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-400 hover:text-white border border-white/[0.08] rounded-lg hover:bg-white/[0.04] transition-colors"
+                    >
+                      {copiedId === selectedPost.id ? (
+                        <>
+                          <Check className="w-4 h-4 text-green-400" />
+                          <span className="text-green-400">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {saved && (
+                      <span className="flex items-center gap-1 text-xs text-green-400">
+                        <Check className="w-3 h-3" />
+                        Saved
+                      </span>
+                    )}
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={saving || editContent === selectedPost.content}
+                      className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-white bg-[#4374BA] hover:bg-[#4374BA]/80 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {saving ? (
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        "Save"
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
