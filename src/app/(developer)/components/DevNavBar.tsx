@@ -179,6 +179,12 @@ export default function DevNavBar() {
                         >
                           API Keys
                         </Link>
+                        <Link
+                          href="/dashboard/webhooks"
+                          className="block px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+                        >
+                          Webhooks
+                        </Link>
                         <div className="border-t border-white/[0.06] my-1" />
                         <button
                           onClick={handleSignOut}
