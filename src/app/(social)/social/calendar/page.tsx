@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Check, Circle, CheckCircle, X, Plus, Trash2 } from "lucide-react";
+import { Copy, Check, Circle, CheckCircle, X, Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSocialAuth } from "../../components/SocialAuthProvider";
 
 interface CalendarPost {
@@ -356,7 +356,21 @@ export default function CalendarPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Calendar</h1>
-          <p className="text-sm text-gray-400 mt-1">{monthLabel}</p>
+          <div className="flex items-center gap-1 mt-1">
+            <button
+              onClick={() => setWeekOffset((w) => w - 4)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <p className="text-sm text-gray-400">{monthLabel}</p>
+            <button
+              onClick={() => setWeekOffset((w) => w + 4)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button
