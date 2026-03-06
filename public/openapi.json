@@ -572,6 +572,57 @@
         }
       }
     },
+    "/reports/{id}/download": {
+      "get": {
+        "operationId": "downloadReportFec",
+        "summary": "Download FEC file",
+        "description": "Downloads the generated FEC filing content for a report as a .fec file. Returns 400 if the FEC file has not yet been generated.",
+        "tags": ["Reports"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Report UUID",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "FEC file content",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "schema": { "type": "string" },
+                "description": "attachment; filename=\"report-{id}.fec\""
+              }
+            }
+          },
+          "400": {
+            "description": "FEC file not yet generated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": { "error": "FEC file not yet generated for this report" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Report not found or does not belong to this committee",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/reports": {
       "get": {
         "operationId": "listReports",
