@@ -76,25 +76,29 @@ export default async function ConventionPage() {
             </p>
           )}
           <CountdownTimer target={CCX_DATE} className="justify-center mb-10" />
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Link
-              href="/ccx/register"
-              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#4374BA] hover:border-[#4374BA] hover:text-white"
-            >
-              Become a Delegate
-            </Link>
-            <Link
-              href="/ccx/ideas"
-              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24] hover:text-white"
-            >
-              Submit an Idea
-            </Link>
-            <Link
-              href="/involved/join"
-              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
-            >
-              Get Involved
-            </Link>
+          <div className="flex flex-col items-center gap-4 mt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/ccx/register"
+                className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#4374BA] hover:border-[#4374BA] hover:text-white"
+              >
+                Become a Delegate
+              </Link>
+              <Link
+                href="/ccx/ideas"
+                className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24] hover:text-white"
+              >
+                Submit an Idea
+              </Link>
+            </div>
+            <div>
+              <Link
+                href="/involved/join"
+                className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+              >
+                Get Involved
+              </Link>
+            </div>
           </div>
         </div>
         {page?.imageCredit && (
