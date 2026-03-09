@@ -41,6 +41,7 @@ const navItems: NavItem[] = [
       { label: "Declaration", href: "/party/declaration" },
       { label: "Our Mission", href: "/party/mission" },
       { label: "Our Politics", href: "/party/politics" },
+      { label: "The Corporation", href: "/party/the-corporation" },
     ],
   },
   {

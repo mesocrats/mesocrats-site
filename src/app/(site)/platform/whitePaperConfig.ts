@@ -172,6 +172,15 @@ export const whitePaperConfig: Record<string, WhitePaperEntry[]> = {
       pdfPath: "/documents/MP_Equal_Under_the_Law_v1.pdf",
     },
   ],
+  "the-corporation": [
+    {
+      id: "the-corporation",
+      eyebrow: "PARTY WHITE PAPER",
+      headline: "The Corporation and the Republic",
+      subheadline: "How two companies came to control American political infrastructure -- and what the Mesocratic Party intends to do about it.",
+      pdfPath: "/documents/MP_The_Corporation_v1.pdf",
+    },
+  ],
   "permanent-panels": [
     {
       id: "wp-free-expression",
