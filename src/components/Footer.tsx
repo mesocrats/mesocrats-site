@@ -77,20 +77,9 @@ const F = {
         { label: "CCX", url: "/ccx" },
         { label: "Research", url: "/research" },
         { label: "News", url: "/news" },
-        { label: "Contact", url: "/contact" },
-      ],
-    },
-    {
-      heading: "Legal",
-      links: [
-        { label: "Privacy Policy", url: "/privacy" },
-        { label: "Terms of Service", url: "/terms" },
-        { label: "FEC Disclosures", url: "/disclosures" },
       ],
     },
   ],
-  fecDisclaimer:
-    "Paid for by the Mesocratic National Committee. Not authorized by any candidate or candidate\u2019s committee.",
 };
 
 interface FooterColumn {
@@ -116,15 +105,13 @@ export default async function Footer() {
       ? settings.footerColumns
       : F.footerColumns;
 
-  const fecDisclaimer = settings?.fecDisclaimer || F.fecDisclaimer;
-  const copyrightText = settings?.copyrightText;
   const socialLinks: SocialLink[] = settings?.socialLinks || [];
 
   return (
     <footer className="bg-primary text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Footer link columns */}
-        <div className="grid grid-cols-2 md:grid-cols-[repeat(6,auto)] gap-x-4 gap-y-8 md:gap-x-12 md:gap-y-0 md:justify-start mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-[repeat(5,auto)] gap-x-4 gap-y-8 md:gap-x-12 md:gap-y-0 md:justify-start mb-10">
           {columns.map((section) => (
             <div key={section.heading}>
               <h3 className="text-xs font-semibold uppercase tracking-wider mb-3">
@@ -186,20 +173,23 @@ export default async function Footer() {
 
         {/* Divider */}
         <div className="border-t border-white/10 pt-8">
-          {/* FEC Disclaimer */}
-          <p className="text-xs text-white/50 leading-relaxed mb-4">
-            {fecDisclaimer}
-          </p>
+          {/* Admin links bar */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 mb-6">
+            <Link href="/contact" className="text-xs text-white/50 hover:text-white transition-colors">Contact Us</Link>
+            <Link href="/privacy" className="text-xs text-white/50 hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-xs text-white/50 hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/disclosures" className="text-xs text-white/50 hover:text-white transition-colors">FEC Disclosures</Link>
+          </div>
 
-          {/* Copyright */}
-          <p className="text-xs text-white/40">
-            {copyrightText || (
-              <>
-                &copy; {new Date().getFullYear()} The Mesocratic Party. All
-                rights reserved.
-              </>
-            )}
-          </p>
+          {/* Copyright & disclaimer block */}
+          <div className="text-xs text-white/40 leading-relaxed space-y-1">
+            <p>Copyright &copy; 2026 MNC Services Corporation. All rights reserved.</p>
+            <p>Paid for by the MESOCRATIC NATIONAL COMMITTEE</p>
+            <p>This communication is not authorized by any candidate or candidate&apos;s committee.</p>
+            <p className="font-bold mt-3">MESOCRATIC NATIONAL COMMITTEE</p>
+            <p>P.O. Box 4218</p>
+            <p>Richmond, VA 23058</p>
+          </div>
         </div>
       </div>
     </footer>

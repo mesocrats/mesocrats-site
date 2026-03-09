@@ -69,8 +69,6 @@ const navItems: NavItem[] = [
       { label: "Run for Office", href: "/candidates/run" },
     ],
   },
-  { label: "News", href: "/news" },
-  { label: "Contact", href: "/contact" },
   { label: "Donate", href: "/donate" },
 ];
 
