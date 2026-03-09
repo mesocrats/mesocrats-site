@@ -4,19 +4,7 @@ import PortableTextRenderer from "@/components/PortableTextRenderer";
 import LivingPlatformCallout from "@/components/LivingPlatformCallout";
 import { client } from "@/sanity/lib/client";
 import { pageBySlugQuery, siteSettingsQuery } from "@/sanity/lib/queries";
-import {
-  whitePaperConfig,
-  type WhitePaperEntry,
-} from "../../platform/whitePaperConfig";
-
-const papers = whitePaperConfig["permanent-panels"];
-const countWords: Record<number, string> = {
-  2: "Two",
-  3: "Three",
-  4: "Four",
-  5: "Five",
-};
-const countWord = countWords[papers.length] || String(papers.length);
+import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await client.fetch(
@@ -53,6 +41,9 @@ export default async function PermanentPanelsPage() {
           </>
         )}
         <div className="relative max-w-3xl mx-auto text-center">
+          <p className="inline-block bg-white text-accent rounded-full px-3 py-1 text-sm uppercase tracking-[0.2em] font-extrabold mb-4">
+            CONSTITUTIONAL CONVENTION X
+          </p>
           {page?.heroHeadline && (
             <h1 className="text-5xl sm:text-7xl font-bold mb-6">
               {page.heroHeadline}
@@ -63,12 +54,20 @@ export default async function PermanentPanelsPage() {
               {page.heroSubheadline}
             </p>
           )}
-          <a
-            href="#white-papers"
-            className="inline-block mt-6 border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
-          >
-            Read the White Papers
-          </a>
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            <Link
+              href="/ccx/permanent-panels/free-expression"
+              className="border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+            >
+              Free Expression Panel →
+            </Link>
+            <Link
+              href="/ccx/permanent-panels/religion"
+              className="border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+            >
+              Religion Panel →
+            </Link>
+          </div>
         </div>
         {page?.imageCredit && (
           <span className="absolute bottom-2 right-3 text-[9px] text-white/50">
@@ -85,42 +84,6 @@ export default async function PermanentPanelsPage() {
         {page?.content && page.content.length > 0 && (
           <PortableTextRenderer value={page.content} />
         )}
-
-        {/* White Paper Cards */}
-        <section id="white-papers" className="mt-16 mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
-          <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
-            WHITE PAPERS
-          </p>
-          <h3 className="text-2xl font-bold mb-2">
-            Dive Deeper
-          </h3>
-          <p className="text-white/80 leading-relaxed mb-6">
-            {countWord} white papers support this position.
-          </p>
-          <div className="flex flex-col gap-4">
-            {papers.map((paper: WhitePaperEntry) => (
-              <div key={paper.id} className="bg-white rounded-lg p-6 sm:p-8">
-                <p className="text-xs font-bold tracking-widest uppercase text-accent/60 mb-2">
-                  {paper.eyebrow}
-                </p>
-                <h4 className="text-xl font-bold text-gray-900 mb-1">
-                  {paper.headline}
-                </h4>
-                <p className="text-gray-600 leading-relaxed mb-4">
-                  {paper.subheadline}
-                </p>
-                <a
-                  href={paper.pdfPath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-accent text-white font-bold px-6 py-3 rounded hover:bg-accent-light transition-colors"
-                >
-                  Download the White Paper (PDF)
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
 
         {/* Living Platform Callout */}
         <LivingPlatformCallout

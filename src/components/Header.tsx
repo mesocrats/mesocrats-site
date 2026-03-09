@@ -8,7 +8,6 @@ interface NavChild {
   label: string;
   href: string;
   external?: boolean;
-  indent?: boolean;
 }
 
 interface NavItemWithChildren {
@@ -58,8 +57,6 @@ const navItems: NavItem[] = [
     children: [
       { label: "What To Know", href: "/ccx" },
       { label: "Permanent Panels", href: "/ccx/permanent-panels" },
-      { label: "\u21B3 Free Expression", href: "/ccx/permanent-panels/free-expression", indent: true },
-      { label: "\u21B3 Religion", href: "/ccx/permanent-panels/religion", indent: true },
       { label: "Participation", href: "/ccx/register" },
       { label: "Submit Ideas", href: "/ccx/ideas" },
     ],
@@ -144,7 +141,7 @@ export default function Header() {
                             <Link
                               key={child.href}
                               href={child.href}
-                              className={`block py-2.5 text-sm hover:bg-gray-light transition-colors ${child.indent ? "pl-8 pr-4" : "px-4"}`}
+                              className="block px-4 py-2.5 text-sm hover:bg-gray-light transition-colors"
                             >
                               {child.label}
                             </Link>
@@ -248,7 +245,7 @@ export default function Header() {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className={`block py-2 text-sm text-white/70 hover:text-accent-light transition-colors ${child.indent ? "pl-6 pr-2" : "px-2"}`}
+                          className="block px-2 py-2 text-sm text-white/70 hover:text-accent-light transition-colors"
                           onClick={() => setMobileOpen(false)}
                         >
                           {child.label}
