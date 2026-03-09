@@ -17,6 +17,22 @@ interface WhitePaper {
 
 const papers: WhitePaper[] = [
   {
+    category: "OUR POLITICS",
+    title: "Our Politics",
+    summary:
+      "The Mesocratic political framework — why neither left nor right has the answer, and what the radical center actually means.",
+    pdfPath: "/documents/MP_The_Politiverse_v1.pdf",
+    panelHref: "/party/politics",
+  },
+  {
+    category: "THE CORPORATION",
+    title: "The Corporation and the Republic",
+    summary:
+      "How two companies came to control American political infrastructure — and what the Mesocratic Party intends to do about it.",
+    pdfPath: "/documents/MP_The_Corporation_v1.pdf",
+    panelHref: "/party/the-corporation",
+  },
+  {
     category: "TAX REFORM",
     title: "The 15% Plan",
     summary:
