@@ -75,6 +75,7 @@ const F = {
       heading: "Resources",
       links: [
         { label: "CCX", url: "/ccx" },
+        { label: "Research", url: "/research" },
         { label: "News", url: "/news" },
         { label: "Contact", url: "/contact" },
       ],

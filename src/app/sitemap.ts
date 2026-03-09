@@ -41,6 +41,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/ccx/permanent-panels/free-expression`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/ccx/permanent-panels/religion`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/party/the-corporation`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteUrl}/research`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/involved/join`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteUrl}/involved/volunteer`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/candidates/run`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
