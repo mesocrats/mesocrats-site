@@ -172,4 +172,20 @@ export const whitePaperConfig: Record<string, WhitePaperEntry[]> = {
       pdfPath: "/documents/MP_Equal_Under_the_Law_v1.pdf",
     },
   ],
+  "permanent-panels": [
+    {
+      id: "free-expression",
+      eyebrow: "PERMANENT PANEL -- FIRST AMENDMENT",
+      headline: "Free Expression and the Open Society",
+      subheadline: "The right to speak, criticize, offend, satirize, and dissent belongs to everyone -- not just those currently in favor.",
+      pdfPath: "/documents/MP_Free_Expression_v1.pdf",
+    },
+    {
+      id: "religion",
+      eyebrow: "PERMANENT PANEL -- FIRST AMENDMENT",
+      headline: "Religion and the Open Society",
+      subheadline: "Four principles for governing in a country where faith is real, powerful, and not going anywhere.",
+      pdfPath: "/documents/MP_Religion_v1.pdf",
+    },
+  ],
 };

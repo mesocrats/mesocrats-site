@@ -1,0 +1,156 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import PortableTextRenderer from "@/components/PortableTextRenderer";
+import LivingPlatformCallout from "@/components/LivingPlatformCallout";
+import { client } from "@/sanity/lib/client";
+import { pageBySlugQuery, siteSettingsQuery } from "@/sanity/lib/queries";
+import {
+  whitePaperConfig,
+  type WhitePaperEntry,
+} from "../../platform/whitePaperConfig";
+
+const papers = whitePaperConfig["permanent-panels"];
+const countWords: Record<number, string> = {
+  2: "Two",
+  3: "Three",
+  4: "Four",
+  5: "Five",
+};
+const countWord = countWords[papers.length] || String(papers.length);
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await client.fetch(
+    pageBySlugQuery,
+    { slug: "permanent-panels" },
+    { next: { revalidate: 60 } }
+  );
+  return {
+    title: page?.seo?.metaTitle || undefined,
+    description: page?.seo?.metaDescription || undefined,
+  };
+}
+
+export default async function PermanentPanelsPage() {
+  const [page, siteSettings] = await Promise.all([
+    client.fetch(pageBySlugQuery, { slug: "permanent-panels" }, { next: { revalidate: 60 } }),
+    client.fetch(siteSettingsQuery, {}, { next: { revalidate: 60 } }),
+  ]);
+
+  return (
+    <div>
+      {/* Hero */}
+      <section className="relative bg-primary text-white py-16 sm:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {page?.heroImage && (
+          <>
+            <Image
+              src={page.heroImage}
+              alt=""
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </>
+        )}
+        <div className="relative max-w-4xl mx-auto text-center">
+          {page?.heroEyebrow && (
+            <p className="inline-block bg-white text-accent rounded-full px-3 py-1 text-sm uppercase tracking-[0.2em] font-extrabold mb-4">
+              {page.heroEyebrow}
+            </p>
+          )}
+          {page?.heroHeadline && (
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold mb-6">
+              {page.heroHeadline}
+            </h1>
+          )}
+          {page?.heroSubheadline && (
+            <p className="text-lg font-semibold text-white/90 max-w-2xl mx-auto mb-10">
+              {page.heroSubheadline}
+            </p>
+          )}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {page?.heroCta1Link && page?.heroCta1Label && (
+              <a
+                href={page.heroCta1Link}
+                className="bg-secondary hover:bg-secondary-light text-white font-bold px-8 py-3 rounded transition-colors text-center"
+              >
+                {page.heroCta1Label}
+              </a>
+            )}
+            {page?.heroCta2Link && page?.heroCta2Label && (
+              <Link
+                href={page.heroCta2Link}
+                className="border-2 border-white/30 text-white font-semibold px-8 py-3 rounded hover:bg-white/10 transition-colors text-center"
+              >
+                {page.heroCta2Label}
+              </Link>
+            )}
+          </div>
+        </div>
+        {page?.imageCredit && (
+          <span className="absolute bottom-2 right-3 text-[9px] text-white/50">
+            {page.imageCredit}
+          </span>
+        )}
+      </section>
+
+      {/* Accent divider bar */}
+      <div className="h-1 bg-accent" />
+
+      {/* Body content (rich text) */}
+      {page?.content && page.content.length > 0 && (
+        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto">
+            <PortableTextRenderer value={page.content} />
+          </div>
+        </section>
+      )}
+
+      {/* White Paper Cards */}
+      <section className="px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+        <div className="max-w-4xl mx-auto">
+          <section id="white-papers" className="mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
+            <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
+              WHITE PAPERS
+            </p>
+            <h3 className="text-2xl font-bold mb-2">
+              Dive Deeper
+            </h3>
+            <p className="text-white/80 leading-relaxed mb-6">
+              {countWord} white papers support this position.
+            </p>
+            <div className="flex flex-col gap-4">
+              {papers.map((paper: WhitePaperEntry) => (
+                <div key={paper.id} className="bg-white rounded-lg p-6 sm:p-8">
+                  <p className="text-xs font-bold tracking-widest uppercase text-accent/60 mb-2">
+                    {paper.eyebrow}
+                  </p>
+                  <h4 className="text-xl font-bold text-gray-900 mb-1">
+                    {paper.headline}
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    {paper.subheadline}
+                  </p>
+                  <Link
+                    href={`/platform/permanent-panels/white-paper/${paper.id}`}
+                    className="inline-block bg-accent text-white font-bold px-6 py-3 rounded hover:bg-accent-light transition-colors"
+                  >
+                    Read the White Paper
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Living Platform Callout */}
+          <LivingPlatformCallout
+            headline={siteSettings?.livingPlatformHeadline}
+            body={siteSettings?.livingPlatformBody}
+            ctas={siteSettings?.livingPlatformCtas}
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
