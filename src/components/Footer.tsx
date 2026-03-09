@@ -48,9 +48,9 @@ const F = {
     {
       heading: "Party",
       links: [
-        { label: "Declaration", url: "/about/declaration" },
-        { label: "Our Mission", url: "/about/mission" },
-        { label: "Our Politics", url: "/about/politics" },
+        { label: "Declaration", url: "/party/declaration" },
+        { label: "Our Mission", url: "/party/mission" },
+        { label: "Our Politics", url: "/party/politics" },
       ],
     },
     {

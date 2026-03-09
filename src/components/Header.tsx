@@ -37,9 +37,9 @@ const navItems: NavItem[] = [
   {
     label: "Party",
     children: [
-      { label: "Declaration", href: "/about/declaration" },
-      { label: "Our Mission", href: "/about/mission" },
-      { label: "Our Politics", href: "/about/politics" },
+      { label: "Declaration", href: "/party/declaration" },
+      { label: "Our Mission", href: "/party/mission" },
+      { label: "Our Politics", href: "/party/politics" },
     ],
   },
   {
