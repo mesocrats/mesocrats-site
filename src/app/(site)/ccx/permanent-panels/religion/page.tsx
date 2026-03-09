@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import PortableTextRenderer from "@/components/PortableTextRenderer";
 import LivingPlatformCallout from "@/components/LivingPlatformCallout";
 import { client } from "@/sanity/lib/client";
@@ -97,12 +96,14 @@ export default async function ReligionPage() {
           <p className="text-white/80 leading-relaxed mb-6">
             {paper.headline} -- {paper.subheadline}
           </p>
-          <Link
-            href={`/platform/permanent-panels/white-paper/${paper.id}`}
+          <a
+            href={paper.pdfPath}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
           >
-            Read the White Paper
-          </Link>
+            Download the White Paper (PDF)
+          </a>
         </section>
 
         {/* Living Platform Callout */}

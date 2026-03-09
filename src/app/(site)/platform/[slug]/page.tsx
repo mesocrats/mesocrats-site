@@ -224,12 +224,14 @@ export default async function PolicyPage({
             <p className="text-white/80 leading-relaxed mb-6">
               {whitePaperConfig[page.slug.current][0].headline} — {whitePaperConfig[page.slug.current][0].subheadline}
             </p>
-            <Link
-              href={`/platform/${page.slug.current}/white-paper/${whitePaperConfig[page.slug.current][0].id}`}
+            <a
+              href={whitePaperConfig[page.slug.current][0].pdfPath}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
             >
-              Read the White Paper
-            </Link>
+              Download the White Paper (PDF)
+            </a>
           </section>
         )}
         {whitePaperConfig[page.slug.current]?.length > 1 && (() => {
@@ -259,12 +261,14 @@ export default async function PolicyPage({
                     <p className="text-gray-600 leading-relaxed mb-4">
                       {paper.subheadline}
                     </p>
-                    <Link
-                      href={`/platform/${page.slug.current}/white-paper/${paper.id}`}
+                    <a
+                      href={paper.pdfPath}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-block bg-accent text-white font-bold px-6 py-3 rounded hover:bg-accent-light transition-colors"
                     >
-                      Read the White Paper
-                    </Link>
+                      Download the White Paper (PDF)
+                    </a>
                   </div>
                 ))}
               </div>
