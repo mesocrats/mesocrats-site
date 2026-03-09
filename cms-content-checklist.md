@@ -75,7 +75,7 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 
 ---
 
-## 2. Mission Page (`/about/mission`)
+## 2. Mission Page (`/party/mission`)
 
 **Doc type:** `page` | **Slug:** `mission`
 
