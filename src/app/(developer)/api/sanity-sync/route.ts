@@ -43,7 +43,7 @@ import crypto from "crypto";
  */
 const TYPE_TO_PATHS: Record<string, string[]> = {
   policyPage: ["/platform", "/platform/[slug]"],
-  page: ["/", "/party/mission", "/about/story", "/party/declaration", "/about/idea", "/about/leadership", "/about/faq", "/party/politics", "/platform/how-it-works", "/ccx/permanent-panels"],
+  page: ["/", "/party/mission", "/about/story", "/party/declaration", "/about/idea", "/about/leadership", "/about/faq", "/party/politics", "/platform/how-it-works", "/ccx/permanent-panels", "/ccx/permanent-panels/free-expression", "/ccx/permanent-panels/religion"],
   newsPost: ["/news", "/news/[slug]"],
   faqEntry: ["/about/faq"],
   siteSettings: ["/", "/platform", "/platform/[slug]", "/news", "/party/mission"],

@@ -69,23 +69,25 @@ export default async function PermanentPanelsPage() {
               {page.heroSubheadline}
             </p>
           )}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {page?.heroCta1Link && page?.heroCta1Label && (
-              <a
-                href={page.heroCta1Link}
-                className="bg-secondary hover:bg-secondary-light text-white font-bold px-8 py-3 rounded transition-colors text-center"
-              >
-                {page.heroCta1Label}
-              </a>
-            )}
-            {page?.heroCta2Link && page?.heroCta2Label && (
-              <Link
-                href={page.heroCta2Link}
-                className="border-2 border-white/30 text-white font-semibold px-8 py-3 rounded hover:bg-white/10 transition-colors text-center"
-              >
-                {page.heroCta2Label}
-              </Link>
-            )}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <Link
+              href="/ccx/register"
+              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#4374BA] hover:border-[#4374BA] hover:text-white"
+            >
+              Become a Delegate
+            </Link>
+            <Link
+              href="/ccx/ideas"
+              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24] hover:text-white"
+            >
+              Submit an Idea
+            </Link>
+            <a
+              href="#white-papers"
+              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+            >
+              Read the White Papers
+            </a>
           </div>
         </div>
         {page?.imageCredit && (
@@ -109,8 +111,8 @@ export default async function PermanentPanelsPage() {
 
       {/* White Paper Cards */}
       <section className="px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-        <div className="max-w-4xl mx-auto">
-          <section id="white-papers" className="mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
+        <div id="white-papers" className="max-w-4xl mx-auto">
+          <section className="mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
             <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
               WHITE PAPERS
             </p>

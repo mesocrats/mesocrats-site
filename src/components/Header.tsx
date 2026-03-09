@@ -56,6 +56,8 @@ const navItems: NavItem[] = [
     children: [
       { label: "What To Know", href: "/ccx" },
       { label: "Permanent Panels", href: "/ccx/permanent-panels" },
+      { label: "Free Expression", href: "/ccx/permanent-panels/free-expression" },
+      { label: "Religion", href: "/ccx/permanent-panels/religion" },
       { label: "Participation", href: "/ccx/register" },
       { label: "Submit Ideas", href: "/ccx/ideas" },
     ],

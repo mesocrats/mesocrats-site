@@ -38,6 +38,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/ccx/register`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteUrl}/ccx/ideas`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteUrl}/ccx/permanent-panels`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteUrl}/ccx/permanent-panels/free-expression`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteUrl}/ccx/permanent-panels/religion`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/involved/join`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteUrl}/involved/volunteer`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/candidates/run`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },

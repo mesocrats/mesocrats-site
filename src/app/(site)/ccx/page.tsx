@@ -76,23 +76,25 @@ export default async function ConventionPage() {
             </p>
           )}
           <CountdownTimer target={CCX_DATE} className="justify-center mb-10" />
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {page?.heroCta1Link && page?.heroCta1Label && (
-              <a
-                href={page.heroCta1Link}
-                className="bg-secondary hover:bg-secondary-light text-white font-bold px-8 py-3 rounded transition-colors text-center"
-              >
-                {page.heroCta1Label}
-              </a>
-            )}
-            {page?.heroCta2Link && page?.heroCta2Label && (
-              <Link
-                href={page.heroCta2Link}
-                className="border-2 border-white/30 text-white font-semibold px-8 py-3 rounded hover:bg-white/10 transition-colors text-center"
-              >
-                {page.heroCta2Label}
-              </Link>
-            )}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <Link
+              href="/ccx/register"
+              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#4374BA] hover:border-[#4374BA] hover:text-white"
+            >
+              Become a Delegate
+            </Link>
+            <Link
+              href="/ccx/ideas"
+              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24] hover:text-white"
+            >
+              Submit an Idea
+            </Link>
+            <Link
+              href="/involved/join"
+              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+            >
+              Get Involved
+            </Link>
           </div>
         </div>
         {page?.imageCredit && (
