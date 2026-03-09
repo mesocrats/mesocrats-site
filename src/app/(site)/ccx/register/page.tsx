@@ -96,7 +96,7 @@ export default async function ConventionRegisterPage() {
                 reserved for elected State Reps.
               </p>
               <Link
-                href="/convention/register"
+                href="/ccx/register"
                 className="inline-block mt-6 text-sm font-semibold text-secondary hover:underline"
               >
                 Register &rarr;
@@ -112,7 +112,7 @@ export default async function ConventionRegisterPage() {
                 still be part of the moment.
               </p>
               <Link
-                href="/convention/register"
+                href="/ccx/register"
                 className="inline-block mt-6 text-sm font-semibold text-secondary hover:underline"
               >
                 Register for Updates &rarr;

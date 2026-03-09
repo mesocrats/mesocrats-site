@@ -35,7 +35,7 @@ export default function LivingPlatform() {
             </li>
             <li>
               <Link
-                href="/convention"
+                href="/ccx"
                 className="text-secondary hover:underline font-medium"
               >
                 Submit an Idea
@@ -46,7 +46,7 @@ export default function LivingPlatform() {
             </li>
             <li>
               <Link
-                href="/convention"
+                href="/ccx"
                 className="text-secondary hover:underline font-medium"
               >
                 Learn about CCX

@@ -48,9 +48,9 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 | 14 | `ctaSection.headline` | "Constitutional Convention X" |
 | 15 | `ctaSection.body` | Two paragraphs about CCX and delegates (see code for full text) |
 | 16 | `ctaSection.ctaLabel` | "GET INVOLVED" |
-| 17 | `ctaSection.ctaLink` | "/convention" |
+| 17 | `ctaSection.ctaLink` | "/ccx" |
 | 18 | `ctaSection.secondaryLabel` | "Submit your ideas for the platform →" |
-| 19 | `ctaSection.secondaryLink` | "/convention" |
+| 19 | `ctaSection.secondaryLink` | "/ccx" |
 
 **Text Section / Callout Block** (comparison section):
 
@@ -191,7 +191,7 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 |---|-----------|----------|
 | 11 | `ctaSection.body` | "Want to shape these positions? Join the party and make your voice heard at Convention X." |
 | 12 | `ctaSection.ctaLabel` | "Learn About Convention X" |
-| 13 | `ctaSection.ctaLink` | "/convention" |
+| 13 | `ctaSection.ctaLink` | "/ccx" |
 
 ### Also uses Site Settings
 
@@ -229,9 +229,9 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 | 6 | `ctaSection.ctaLabel` | "Join the Party — Your Voice Starts Here" |
 | 7 | `ctaSection.ctaLink` | "/involved/join" |
 | 8 | `ctaSection.secondaryLabel` | "Learn about Constitutional Convention X →" |
-| 9 | `ctaSection.secondaryLink` | "/convention" |
+| 9 | `ctaSection.secondaryLink` | "/ccx" |
 | 10 | `ctaSection.linkText` | "Submit a Policy Idea →" |
-| 11 | `ctaSection.linkUrl` | "/convention" |
+| 11 | `ctaSection.linkUrl` | "/ccx" |
 
 ### SEO
 
@@ -279,7 +279,7 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 
 ---
 
-## 8. Convention Page (`/convention`)
+## 8. Convention Page (`/ccx`)
 
 **Doc type:** `page` | **Slug:** `convention`
 
@@ -326,7 +326,7 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 
 ---
 
-## 9. Convention — Submit Ideas (`/convention/ideas`)
+## 9. Convention — Submit Ideas (`/ccx/ideas`)
 
 **Doc type:** `formPageContent` | **Form type:** `submit-ideas`
 
@@ -344,7 +344,7 @@ Once you fill the field in the CMS, the hardcoded fallback is ignored.
 
 ---
 
-## 10. Convention — Register (`/convention/register`)
+## 10. Convention — Register (`/ccx/register`)
 
 **Doc type:** `formPageContent` | **Form type:** `ccx-register`
 

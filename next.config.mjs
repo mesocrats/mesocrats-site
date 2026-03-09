@@ -30,6 +30,24 @@ const nextConfig = {
         permanent: true,
         statusCode: 308,
       },
+      {
+        source: '/convention',
+        destination: '/ccx',
+        permanent: true,
+        statusCode: 308,
+      },
+      {
+        source: '/convention/register',
+        destination: '/ccx/register',
+        permanent: true,
+        statusCode: 308,
+      },
+      {
+        source: '/convention/ideas',
+        destination: '/ccx/ideas',
+        permanent: true,
+        statusCode: 308,
+      },
     ];
   },
 };

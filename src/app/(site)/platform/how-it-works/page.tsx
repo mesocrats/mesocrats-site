@@ -145,8 +145,8 @@ export default async function HowItWorksPage() {
           body="The position on this page is a starting point — not the final word. The Mesocratic Party's platform is written, debated, and ratified by its members at Constitutional Convention X, held annually in New Orleans every May. Between conventions, members shape the agenda through year-round digital engagement. These positions will evolve as the party grows. That's not a weakness. It's the whole point."
           ctas={[
             { label: "Join the Party", url: "/involved/join" },
-            { label: "Submit an Idea", url: "/convention/ideas" },
-            { label: "Learn about CCX", url: "/convention" },
+            { label: "Submit an Idea", url: "/ccx/ideas" },
+            { label: "Learn about CCX", url: "/ccx" },
             { label: "How Our Platform Works", url: "/platform/how-it-works" },
           ]}
         />
