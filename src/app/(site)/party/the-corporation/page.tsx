@@ -29,7 +29,7 @@ export default async function TheCorporationPage() {
   return (
     <main className="scroll-smooth">
       {/* Hero */}
-      <section className="relative py-20 md:py-32 bg-gray-900 text-white overflow-hidden">
+      <section className="relative bg-accent text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {page?.heroImage && (
           <>
             <Image
@@ -42,19 +42,19 @@ export default async function TheCorporationPage() {
             <div className="absolute inset-0 bg-black/60" />
           </>
         )}
-        <div className="relative max-w-4xl mx-auto px-6 text-center">
+        <div className="relative max-w-3xl mx-auto text-center">
           {page?.heroEyebrow && (
-            <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-4">
+            <span className="inline-block bg-white text-accent rounded-full px-3 py-1 text-sm font-bold tracking-wide uppercase mb-4">
               {page.heroEyebrow}
-            </p>
+            </span>
           )}
           {page?.heroHeadline && (
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4">
+            <h1 className="text-5xl sm:text-7xl font-bold mb-4">
               {page.heroHeadline}
             </h1>
           )}
           {page?.heroSubheadline && (
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg font-semibold text-white/90 mb-8">
               {page.heroSubheadline}
             </p>
           )}
@@ -76,41 +76,47 @@ export default async function TheCorporationPage() {
       <div className="h-1 bg-accent" />
 
       {/* Content */}
-      <article className="max-w-4xl mx-auto px-6 py-10 sm:py-12">
-        {page?.content && page.content.length > 0 && (
-          <section className="mb-12">
-            <PortableTextRenderer value={page.content} />
-          </section>
-        )}
+      {page?.content && page.content.length > 0 && (
+        <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <PortableTextRenderer value={page.content} />
+        </article>
+      )}
 
-        {/* White Paper Callout */}
-        <section id="white-paper" className="mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
-          <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
-            WHITE PAPER
-          </p>
-          <h3 className="text-2xl font-bold mb-2">
-            Read the Full White Paper
-          </h3>
-          <p className="text-white/80 leading-relaxed mb-6">
-            {paper.headline} -- {paper.subheadline}
-          </p>
-          <a
-            href={paper.pdfPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
-          >
-            Download the White Paper (PDF)
-          </a>
-        </section>
+      {/* White Paper Callout */}
+      <section className="px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+        <div className="max-w-3xl mx-auto">
+          <div id="white-paper" className="bg-accent rounded-lg p-8 sm:p-10 text-white">
+            <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
+              WHITE PAPER
+            </p>
+            <h3 className="text-2xl font-bold mb-2">
+              Read the Full White Paper
+            </h3>
+            <p className="text-white/80 leading-relaxed mb-6">
+              {paper.headline} -- {paper.subheadline}
+            </p>
+            <a
+              href={paper.pdfPath}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
+            >
+              Download the White Paper (PDF)
+            </a>
+          </div>
+        </div>
+      </section>
 
-        {/* Living Platform Callout */}
-        <LivingPlatformCallout
-          headline={siteSettings?.livingPlatformHeadline}
-          body={siteSettings?.livingPlatformBody}
-          ctas={siteSettings?.livingPlatformCtas}
-        />
-      </article>
+      {/* Living Platform Callout */}
+      <section className="px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+        <div className="max-w-3xl mx-auto">
+          <LivingPlatformCallout
+            headline={siteSettings?.livingPlatformHeadline}
+            body={siteSettings?.livingPlatformBody}
+            ctas={siteSettings?.livingPlatformCtas}
+          />
+        </div>
+      </section>
     </main>
   );
 }
