@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { client } from "@/sanity/lib/client";
 import { formPageContentQuery } from "@/sanity/lib/queries";
@@ -26,8 +27,20 @@ export default async function ConventionRegisterPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="bg-primary text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="relative bg-primary text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {content?.heroImage && (
+          <>
+            <Image
+              src={content.heroImage}
+              alt=""
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </>
+        )}
+        <div className="relative max-w-3xl mx-auto text-center">
           {content?.heroHeadline && (
             <h1 className="text-5xl sm:text-7xl font-bold mb-4">
               {content.heroHeadline}
@@ -39,6 +52,11 @@ export default async function ConventionRegisterPage() {
             </p>
           )}
         </div>
+        {content?.imageCredit && (
+          <span className="absolute bottom-2 right-3 text-[9px] text-white/50">
+            {content.imageCredit}
+          </span>
+        )}
       </section>
 
       {/* Accent divider bar */}

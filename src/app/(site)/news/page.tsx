@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { client } from "@/sanity/lib/client";
-import { allNewsPostsQuery } from "@/sanity/lib/queries";
+import { allNewsPostsQuery, pageBySlugQuery } from "@/sanity/lib/queries";
 import { categoryLabel, formatNewsDate } from "@/lib/utils";
 
 interface NewsPost {
@@ -21,21 +21,39 @@ export const metadata: Metadata = {
 };
 
 export default async function NewsPage() {
-  const posts: NewsPost[] =
-    (await client.fetch(allNewsPostsQuery, {}, { next: { revalidate: 60 } })) ||
-    [];
+  const [posts, page] = await Promise.all([
+    client.fetch(allNewsPostsQuery, {}, { next: { revalidate: 60 } }).then((p: NewsPost[] | null) => p || []),
+    client.fetch(pageBySlugQuery, { slug: "news" }, { next: { revalidate: 60 } }),
+  ]);
 
   const hasPosts = posts.length > 0;
 
   return (
     <div>
       {/* Hero */}
-      <section className="bg-accent text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="relative bg-accent text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {page?.heroImage && (
+          <>
+            <Image
+              src={page.heroImage}
+              alt=""
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </>
+        )}
+        <div className="relative max-w-3xl mx-auto text-center">
           <h1 className="text-5xl sm:text-7xl font-bold mb-4">
             News
           </h1>
         </div>
+        {page?.imageCredit && (
+          <span className="absolute bottom-2 right-3 text-[9px] text-white/50">
+            {page.imageCredit}
+          </span>
+        )}
       </section>
 
       {/* Accent divider bar */}

@@ -45,6 +45,18 @@ export default defineType({
       rows: 2,
     }),
 
+    defineField({
+      name: 'heroImage',
+      title: 'Hero Image',
+      type: 'image',
+      options: { hotspot: true },
+    }),
+    defineField({
+      name: 'imageCredit',
+      title: 'Image Credit',
+      type: 'string',
+    }),
+
     // ── Body Content ──────────────────────────────
     defineField({
       name: 'bodyContent',

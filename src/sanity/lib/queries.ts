@@ -265,6 +265,8 @@ export const formPageContentQuery = `
     formType,
     heroHeadline,
     heroSubheadline,
+    "heroImage": heroImage.asset->url,
+    imageCredit,
     bodyContent,
     cards[] {
       icon,
