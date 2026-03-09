@@ -39,7 +39,7 @@ export default async function PermanentPanelsPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative bg-primary text-white py-16 sm:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-accent text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {page?.heroImage && (
           <>
             <Image
@@ -52,30 +52,23 @@ export default async function PermanentPanelsPage() {
             <div className="absolute inset-0 bg-black/60" />
           </>
         )}
-        <div className="relative max-w-4xl mx-auto text-center">
-          {page?.heroEyebrow && (
-            <p className="inline-block bg-white text-accent rounded-full px-3 py-1 text-sm uppercase tracking-[0.2em] font-extrabold mb-4">
-              {page.heroEyebrow}
-            </p>
-          )}
+        <div className="relative max-w-3xl mx-auto text-center">
           {page?.heroHeadline && (
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold mb-6">
+            <h1 className="text-5xl sm:text-7xl font-bold mb-6">
               {page.heroHeadline}
             </h1>
           )}
           {page?.heroSubheadline && (
-            <p className="text-lg font-semibold text-white/90 max-w-2xl mx-auto mb-10">
+            <p className="text-lg font-semibold text-white/90 leading-relaxed">
               {page.heroSubheadline}
             </p>
           )}
-          <div className="flex justify-center mt-8">
-            <a
-              href="#white-papers"
-              className="inline-block border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
-            >
-              Read the White Papers
-            </a>
-          </div>
+          <a
+            href="#white-papers"
+            className="inline-block mt-6 border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+          >
+            Read the White Papers
+          </a>
         </div>
         {page?.imageCredit && (
           <span className="absolute bottom-2 right-3 text-[9px] text-white/50">
@@ -87,61 +80,55 @@ export default async function PermanentPanelsPage() {
       {/* Accent divider bar */}
       <div className="h-1 bg-accent" />
 
-      {/* Body content (rich text) */}
-      {page?.content && page.content.length > 0 && (
-        <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <PortableTextRenderer value={page.content} />
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Body content (rich text) */}
+        {page?.content && page.content.length > 0 && (
+          <PortableTextRenderer value={page.content} />
+        )}
+
+        {/* White Paper Cards */}
+        <section id="white-papers" className="mt-16 mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
+          <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
+            WHITE PAPERS
+          </p>
+          <h3 className="text-2xl font-bold mb-2">
+            Dive Deeper
+          </h3>
+          <p className="text-white/80 leading-relaxed mb-6">
+            {countWord} white papers support this position.
+          </p>
+          <div className="flex flex-col gap-4">
+            {papers.map((paper: WhitePaperEntry) => (
+              <div key={paper.id} className="bg-white rounded-lg p-6 sm:p-8">
+                <p className="text-xs font-bold tracking-widest uppercase text-accent/60 mb-2">
+                  {paper.eyebrow}
+                </p>
+                <h4 className="text-xl font-bold text-gray-900 mb-1">
+                  {paper.headline}
+                </h4>
+                <p className="text-gray-600 leading-relaxed mb-4">
+                  {paper.subheadline}
+                </p>
+                <a
+                  href={paper.pdfPath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-accent text-white font-bold px-6 py-3 rounded hover:bg-accent-light transition-colors"
+                >
+                  Download the White Paper (PDF)
+                </a>
+              </div>
+            ))}
           </div>
         </section>
-      )}
 
-      {/* White Paper Cards */}
-      <section className="px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-        <div id="white-papers" className="max-w-4xl mx-auto">
-          <section className="mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
-            <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
-              WHITE PAPERS
-            </p>
-            <h3 className="text-2xl font-bold mb-2">
-              Dive Deeper
-            </h3>
-            <p className="text-white/80 leading-relaxed mb-6">
-              {countWord} white papers support this position.
-            </p>
-            <div className="flex flex-col gap-4">
-              {papers.map((paper: WhitePaperEntry) => (
-                <div key={paper.id} className="bg-white rounded-lg p-6 sm:p-8">
-                  <p className="text-xs font-bold tracking-widest uppercase text-accent/60 mb-2">
-                    {paper.eyebrow}
-                  </p>
-                  <h4 className="text-xl font-bold text-gray-900 mb-1">
-                    {paper.headline}
-                  </h4>
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    {paper.subheadline}
-                  </p>
-                  <a
-                    href={paper.pdfPath}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block bg-accent text-white font-bold px-6 py-3 rounded hover:bg-accent-light transition-colors"
-                  >
-                    Download the White Paper (PDF)
-                  </a>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Living Platform Callout */}
-          <LivingPlatformCallout
-            headline={siteSettings?.livingPlatformHeadline}
-            body={siteSettings?.livingPlatformBody}
-            ctas={siteSettings?.livingPlatformCtas}
-          />
-        </div>
-      </section>
+        {/* Living Platform Callout */}
+        <LivingPlatformCallout
+          headline={siteSettings?.livingPlatformHeadline}
+          body={siteSettings?.livingPlatformBody}
+          ctas={siteSettings?.livingPlatformCtas}
+        />
+      </div>
     </div>
   );
 }

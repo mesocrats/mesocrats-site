@@ -31,7 +31,7 @@ export default async function FreeExpressionPage() {
   return (
     <main className="scroll-smooth">
       {/* Hero */}
-      <section className="relative py-20 md:py-32 bg-gray-900 text-white overflow-hidden">
+      <section className="relative bg-accent text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {page?.heroImage && (
           <>
             <Image
@@ -44,19 +44,14 @@ export default async function FreeExpressionPage() {
             <div className="absolute inset-0 bg-black/60" />
           </>
         )}
-        <div className="relative max-w-4xl mx-auto px-6 text-center">
-          {page?.heroEyebrow && (
-            <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-4">
-              {page.heroEyebrow}
-            </p>
-          )}
+        <div className="relative max-w-3xl mx-auto text-center">
           {page?.heroHeadline && (
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4">
+            <h1 className="text-5xl sm:text-7xl font-bold mb-6">
               {page.heroHeadline}
             </h1>
           )}
           {page?.heroSubheadline && (
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg font-semibold text-white/90 leading-relaxed">
               {page.heroSubheadline}
             </p>
           )}
@@ -77,16 +72,14 @@ export default async function FreeExpressionPage() {
       {/* Accent divider bar */}
       <div className="h-1 bg-accent" />
 
-      {/* Content */}
-      <article className="max-w-4xl mx-auto px-6 py-10 sm:py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Content */}
         {page?.content && page.content.length > 0 && (
-          <section className="mb-12">
-            <PortableTextRenderer value={page.content} />
-          </section>
+          <PortableTextRenderer value={page.content} />
         )}
 
         {/* White Paper Callout */}
-        <section id="white-paper" className="mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
+        <section id="white-paper" className="mt-16 mb-16 bg-accent rounded-lg p-8 sm:p-10 text-white">
           <p className="text-xs font-bold tracking-widest uppercase mb-3 text-white/60">
             WHITE PAPER
           </p>
@@ -112,7 +105,7 @@ export default async function FreeExpressionPage() {
           body={siteSettings?.livingPlatformBody}
           ctas={siteSettings?.livingPlatformCtas}
         />
-      </article>
+      </div>
     </main>
   );
 }
