@@ -7,7 +7,6 @@ import { useSocialAuth } from "./SocialAuthProvider";
 
 const navLinks = [
   { label: "Dashboard", href: "/" },
-  { label: "Calendar", href: "/calendar" },
   { label: "Generate", href: "/generate" },
   { label: "Queue", href: "/queue" },
 ];
