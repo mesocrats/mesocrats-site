@@ -101,7 +101,7 @@ export default async function TheCorporationPage() {
               rel="noopener noreferrer"
               className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
             >
-              Download the White Paper (PDF)
+              Read the White Paper
             </a>
           </div>
         </div>
