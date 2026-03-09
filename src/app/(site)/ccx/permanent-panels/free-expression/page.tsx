@@ -8,7 +8,7 @@ import { pageBySlugQuery, siteSettingsQuery } from "@/sanity/lib/queries";
 import { whitePaperConfig } from "../../../platform/whitePaperConfig";
 
 const paper = whitePaperConfig["permanent-panels"].find(
-  (p) => p.id === "free-expression"
+  (p) => p.id === "wp-free-expression"
 )!;
 
 export async function generateMetadata(): Promise<Metadata> {
