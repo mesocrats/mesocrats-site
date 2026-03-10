@@ -3,6 +3,7 @@ import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import DevNavBar from "./components/DevNavBar";
 import DevFooter from "./components/DevFooter";
 import { AuthProviderWrapper } from "./components/AuthProviderWrapper";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -82,6 +83,7 @@ export default function DeveloperLayout({
         <DevNavBar />
         <main className="flex-1 bg-[#101529]">{children}</main>
         <DevFooter />
+        <ScrollToTop />
       </AuthProviderWrapper>
     </div>
   );
