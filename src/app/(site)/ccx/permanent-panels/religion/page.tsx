@@ -31,7 +31,7 @@ export default async function ReligionPage() {
   return (
     <main className="scroll-smooth">
       {/* Hero */}
-      <section className="relative bg-white text-primary py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-[#1A1A2E] text-primary py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {page?.heroImage && (
           <>
             <Image
