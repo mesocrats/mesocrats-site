@@ -120,7 +120,7 @@ export default function ConventionForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-accent hover:bg-accent-light text-white font-bold py-3 rounded transition-colors disabled:opacity-50"
+        className="w-full bg-transparent border border-[#1A1A2E] text-[#1A1A2E] font-bold py-3 rounded transition-all duration-200 hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white disabled:opacity-50"
       >
         {loading ? "SUBMITTING..." : "REGISTER MY INTEREST"}
       </button>

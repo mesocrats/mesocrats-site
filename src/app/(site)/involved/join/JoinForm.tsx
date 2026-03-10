@@ -102,7 +102,7 @@ export default function JoinForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-secondary hover:bg-secondary-light text-white font-bold py-3 rounded transition-colors disabled:opacity-50"
+        className="w-full bg-transparent border border-[#1A1A2E] text-[#1A1A2E] font-bold py-3 rounded transition-all duration-200 hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white disabled:opacity-50"
       >
         {loading ? "SUBMITTING..." : "I'M IN"}
       </button>

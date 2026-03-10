@@ -119,13 +119,13 @@ export default async function JoinPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/involved/volunteer"
-              className="bg-accent hover:bg-accent-light text-white font-bold px-8 py-3 rounded transition-colors"
+              className="bg-transparent border border-[#1A1A2E] text-[#1A1A2E] font-bold px-8 py-3 rounded transition-all duration-200 hover:bg-[#4374BA] hover:border-[#4374BA] hover:text-white"
             >
               Volunteer
             </Link>
             <Link
               href="/platform"
-              className="border-2 border-accent text-accent font-bold px-8 py-3 rounded hover:bg-accent hover:text-white transition-colors"
+              className="bg-transparent border border-[#1A1A2E] text-[#1A1A2E] font-bold px-8 py-3 rounded transition-all duration-200 hover:bg-[#EE2C24] hover:border-[#EE2C24] hover:text-white"
             >
               Read the Platform
             </Link>
