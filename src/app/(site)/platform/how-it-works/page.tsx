@@ -135,7 +135,7 @@ export default async function HowItWorksPage() {
             href="/platform/how-it-works/white-paper"
             className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
           >
-            Read the White Paper
+            Download the PDF
           </Link>
         </section>
 

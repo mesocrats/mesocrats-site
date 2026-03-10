@@ -219,7 +219,7 @@ export default async function PolicyPage({
               WHITE PAPER
             </p>
             <h3 className="text-2xl font-bold mb-2">
-              Download the PDF
+              Read the White Paper
             </h3>
             <p className="text-white/80 leading-relaxed mb-6">
               {whitePaperConfig[page.slug.current][0].headline} — {whitePaperConfig[page.slug.current][0].subheadline}
