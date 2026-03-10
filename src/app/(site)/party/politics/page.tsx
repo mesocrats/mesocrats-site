@@ -118,7 +118,7 @@ export default async function PoliticsPage() {
               {whitePaperConfig["politics"][0].eyebrow}
             </p>
             <h3 className="text-2xl font-bold mb-2">
-              Read the Full White Paper
+              Download the PDF
             </h3>
             <p className="text-white/80 leading-relaxed mb-6">
               {whitePaperConfig["politics"][0].headline} — {whitePaperConfig["politics"][0].subheadline}
@@ -129,7 +129,7 @@ export default async function PoliticsPage() {
               rel="noopener noreferrer"
               className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
             >
-              Read the White Paper
+              Download the PDF
             </a>
           </div>
         </section>

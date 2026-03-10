@@ -52,13 +52,13 @@ console.log(report.filing_id); // -> "FEC-2026-Q1-..."`;
             <div className="mt-8 flex flex-wrap gap-4">
               <a
                 href="/api-reference"
-                className="inline-flex items-center px-6 py-3 rounded-lg bg-[#4374BA] text-white font-medium text-sm hover:bg-[#4374BA]/90 transition-colors"
+                className="inline-flex items-center px-6 py-3 rounded-lg border border-white/30 text-white bg-transparent font-medium text-sm transition-colors hover:bg-[#4374BA] hover:border-[#4374BA]"
               >
                 Read the Docs
               </a>
               <a
                 href="/prompt-library"
-                className="inline-flex items-center px-6 py-3 rounded-lg border border-[#6C3393] text-[#A06BC8] font-medium text-sm hover:bg-[#6C3393]/10 transition-colors"
+                className="inline-flex items-center px-6 py-3 rounded-lg border border-white/30 text-white bg-transparent font-medium text-sm transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24]"
               >
                 Try the Prompt Library
               </a>

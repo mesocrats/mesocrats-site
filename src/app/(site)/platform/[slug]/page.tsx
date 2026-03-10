@@ -219,7 +219,7 @@ export default async function PolicyPage({
               WHITE PAPER
             </p>
             <h3 className="text-2xl font-bold mb-2">
-              Read the Full White Paper
+              Download the PDF
             </h3>
             <p className="text-white/80 leading-relaxed mb-6">
               {whitePaperConfig[page.slug.current][0].headline} — {whitePaperConfig[page.slug.current][0].subheadline}
@@ -230,7 +230,7 @@ export default async function PolicyPage({
               rel="noopener noreferrer"
               className="inline-block bg-white text-accent font-bold px-6 py-3 rounded hover:bg-gray-100 transition-colors"
             >
-              Download the White Paper (PDF)
+              Download the PDF
             </a>
           </section>
         )}
@@ -267,7 +267,7 @@ export default async function PolicyPage({
                       rel="noopener noreferrer"
                       className="inline-block bg-accent text-white font-bold px-6 py-3 rounded hover:bg-accent-light transition-colors"
                     >
-                      Download the White Paper (PDF)
+                      Download the PDF
                     </a>
                   </div>
                 ))}

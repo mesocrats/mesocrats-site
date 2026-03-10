@@ -125,7 +125,7 @@ export default async function HowItWorksPage() {
             WHITE PAPER
           </p>
           <h3 className="text-2xl font-bold mb-2">
-            Read the Full White Paper
+            Read the White Paper
           </h3>
           <p className="text-white/80 leading-relaxed mb-6">
             How We Built the Platform — The Research, Methodology, and Strategic
