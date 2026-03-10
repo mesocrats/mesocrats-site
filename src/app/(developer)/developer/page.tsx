@@ -394,7 +394,7 @@ function OpenSourceCTA() {
           </a>
           <a
             href="/api-reference"
-            className="inline-flex items-center px-6 py-3 rounded-lg bg-[#4374BA] text-white font-medium text-sm hover:bg-[#4374BA]/90 transition-colors"
+            className="inline-flex items-center border border-white/30 text-white bg-transparent font-semibold px-5 py-2.5 text-sm rounded-lg transition-colors hover:bg-[#6C3393] hover:border-[#6C3393]"
           >
             Get Started
           </a>
