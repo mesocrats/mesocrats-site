@@ -142,7 +142,7 @@ const papers: WhitePaper[] = [
     title: "Free Expression and the Open Society",
     summary:
       "The right to speak, criticize, offend, satirize, and dissent belongs to everyone — not just those currently in favor.",
-    pdfPath: "/documents/MP_Free_Expression_v1.pdf",
+    pdfPath: "/documents/MP_Free_Expression_v2.pdf",
     panelHref: "/ccx/permanent-panels/free-expression",
   },
   {
@@ -150,7 +150,7 @@ const papers: WhitePaper[] = [
     title: "Religion and the Open Society",
     summary:
       "Four principles for governing in a country where faith is real, powerful, and not going anywhere.",
-    pdfPath: "/documents/MP_Religion_v1.pdf",
+    pdfPath: "/documents/MP_Religion_v2.pdf",
     panelHref: "/ccx/permanent-panels/religion",
   },
 ];
