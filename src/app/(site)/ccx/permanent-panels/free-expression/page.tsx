@@ -31,7 +31,7 @@ export default async function FreeExpressionPage() {
   return (
     <main className="scroll-smooth">
       {/* Hero */}
-      <section className="relative bg-[#1A1A2E] text-primary py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-primary text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {page?.heroImage && (
           <>
             <Image
@@ -45,11 +45,12 @@ export default async function FreeExpressionPage() {
           </>
         )}
         <div className="relative max-w-3xl mx-auto text-center">
-          {page?.heroHeadline && (
-            <h1 className="text-5xl sm:text-7xl font-bold mb-6">
-              {page.heroHeadline}
-            </h1>
-          )}
+          <p className="inline-block bg-white text-accent rounded-full px-3 py-1 text-sm uppercase tracking-[0.2em] font-extrabold mb-4">
+            THE OPEN SOCIETY
+          </p>
+          <h1 className="text-5xl sm:text-7xl font-bold mb-6">
+            Free Expression in America
+          </h1>
           {page?.heroSubheadline && (
             <p className="text-lg font-semibold text-primary/70 leading-relaxed">
               {page.heroSubheadline}
