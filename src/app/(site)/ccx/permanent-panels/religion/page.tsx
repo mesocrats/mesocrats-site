@@ -52,13 +52,13 @@ export default async function ReligionPage() {
             Religion in America
           </h1>
           {page?.heroSubheadline && (
-            <p className="text-lg font-semibold text-primary/70 leading-relaxed">
+            <p className="text-lg font-semibold text-white/90 leading-relaxed">
               {page.heroSubheadline}
             </p>
           )}
           <a
             href="#white-paper"
-            className="inline-block mt-6 border-2 border-accent text-accent bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-accent hover:text-white"
+            className="inline-block mt-6 border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393]"
           >
             Read the White Paper
           </a>
