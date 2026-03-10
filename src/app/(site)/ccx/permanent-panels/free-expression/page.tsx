@@ -31,7 +31,7 @@ export default async function FreeExpressionPage() {
   return (
     <main className="scroll-smooth">
       {/* Hero */}
-      <section className="relative bg-accent text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-white text-primary py-16 sm:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {page?.heroImage && (
           <>
             <Image
@@ -51,19 +51,19 @@ export default async function FreeExpressionPage() {
             </h1>
           )}
           {page?.heroSubheadline && (
-            <p className="text-lg font-semibold text-white/90 leading-relaxed">
+            <p className="text-lg font-semibold text-primary/70 leading-relaxed">
               {page.heroSubheadline}
             </p>
           )}
           <a
             href="#white-paper"
-            className="inline-block mt-6 border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#6C3393] hover:border-[#6C3393] hover:text-white"
+            className="inline-block mt-6 border-2 border-accent text-accent bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-accent hover:text-white"
           >
             Read the White Paper
           </a>
         </div>
         {page?.imageCredit && (
-          <span className="absolute bottom-2 right-3 text-[9px] text-white/50">
+          <span className="absolute bottom-2 right-3 text-[9px] text-primary/30">
             {page.imageCredit}
           </span>
         )}

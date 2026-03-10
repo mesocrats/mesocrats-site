@@ -57,13 +57,13 @@ export default async function PermanentPanelsPage() {
           <div className="flex flex-wrap justify-center gap-4 mt-6">
             <Link
               href="/ccx/permanent-panels/free-expression"
-              className="border-2 border-[#4374BA] text-white bg-[#4374BA]/20 font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#4374BA] hover:border-[#4374BA]"
+              className="border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#4374BA] hover:border-[#4374BA] hover:text-white"
             >
               Free Expression Panel →
             </Link>
             <Link
               href="/ccx/permanent-panels/religion"
-              className="border-2 border-[#EE2C24] text-white bg-[#EE2C24]/20 font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24]"
+              className="border-2 border-white text-white bg-transparent font-bold px-5 py-2.5 text-sm rounded transition-colors hover:bg-[#EE2C24] hover:border-[#EE2C24] hover:text-white"
             >
               Religion Panel →
             </Link>
