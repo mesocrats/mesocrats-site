@@ -82,10 +82,10 @@ export default async function ConventionRegisterPage() {
                 join 99 others from your state at CCX with a full voice and vote.
               </p>
               <Link
-                href="/involved/join"
+                href="/candidates/run"
                 className="inline-block mt-6 text-sm font-semibold text-secondary hover:underline"
               >
-                Join the Party &rarr;
+                Run for Office &rarr;
               </Link>
             </div>
 
@@ -107,17 +107,17 @@ export default async function ConventionRegisterPage() {
 
             {/* Card 3 */}
             <div className="bg-gray-light rounded-lg p-8 sm:p-10 flex flex-col hover:shadow-lg transition-shadow">
-              <h3 className="text-xl font-bold mb-3">Attend as an Observer</h3>
+              <h3 className="text-xl font-bold mb-3">Volunteer at the Event</h3>
               <p className="text-sm text-primary/70 leading-relaxed flex-1">
-                Not a State Rep? You can still come. Observer registration is open
-                to anyone. You&apos;ll have access to all sessions. Voting is
-                reserved for elected State Reps.
+                Want to be part of CCX without running for State Rep? Volunteer at
+                the event. Help run sessions, support delegates, and be on the
+                ground in New Orleans when history gets made.
               </p>
               <Link
-                href="/ccx/register"
+                href="/involved/volunteer"
                 className="inline-block mt-6 text-sm font-semibold text-secondary hover:underline"
               >
-                Register &rarr;
+                Volunteer Now &rarr;
               </Link>
             </div>
 
@@ -130,7 +130,7 @@ export default async function ConventionRegisterPage() {
                 still be part of the moment.
               </p>
               <Link
-                href="/ccx/register"
+                href="#register"
                 className="inline-block mt-6 text-sm font-semibold text-secondary hover:underline"
               >
                 Register for Updates &rarr;
@@ -268,7 +268,7 @@ export default async function ConventionRegisterPage() {
       </section>
 
       {/* Registration Form */}
-      <section className="bg-gray-light py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
+      <section id="register" className="bg-gray-light py-12 sm:py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           <ConventionForm />
         </div>
