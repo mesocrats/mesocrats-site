@@ -94,7 +94,7 @@ export default function Header() {
               height={48}
               className="h-12 w-auto"
             />
-            <span className="hidden sm:inline text-xl font-bold tracking-tight">
+            <span className="text-sm sm:text-xl font-bold tracking-tight">
               The Mesocratic Party
             </span>
           </Link>
