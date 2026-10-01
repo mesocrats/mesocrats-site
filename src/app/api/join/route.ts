@@ -66,10 +66,10 @@ export async function POST(req: Request) {
           subject: "You're on the list",
           html: `
           <h2>You're on the list</h2>
-          <p>Thank you for wanting to support the Mesocratic Party.</p>
-          <p>Donations are paused while the committee completes its reorganization. We are not accepting contributions until that work is finished.</p>
-          <p>We will email you when donations reopen.</p>
-          <p>&mdash; The Mesocratic Party</p>
+          <p>Thanks for wanting to support the Mesocratic Party.</p>
+          <p>We're setting up the party's official organization and bank accounts. As soon as that's done, we'll start accepting donations, and we'll email you the moment we do.</p>
+          <p>In the meantime, you can join the party for free at <a href="https://mesocrats.org/involved/join">mesocrats.org/involved/join</a>.</p>
+          <p>- The Mesocratic Party</p>
         `,
         }),
       ]);

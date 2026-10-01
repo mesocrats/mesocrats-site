@@ -10,7 +10,7 @@ import DonationFormLoader from './DonationFormLoader';
 
 export const metadata: Metadata = DONATIONS_PAUSED
   ? {
-      title: 'Donations Paused',
+      title: 'Donations Open Soon',
       robots: { index: false, follow: false },
     }
   : { title: 'Donate' };
@@ -70,13 +70,13 @@ function PausedDonations() {
             Committee reorganization
           </span>
           <h1 className="text-4xl sm:text-6xl font-extrabold text-white mb-5 leading-tight">
-            Donations Are Paused.
+            Donations Open Soon.
           </h1>
           <p className="text-lg sm:text-xl text-white/80 max-w-xl mx-auto mb-10 leading-relaxed">
-            We are re-establishing the committee&apos;s legal and banking home.
-            Until that work is finished, we are not accepting contributions. The
-            best way to back the party right now is to join it. Membership is
-            free.
+            We&apos;re setting up the party&apos;s official organization and bank
+            accounts. As soon as that&apos;s done, we&apos;ll start accepting
+            donations. Until then, the best way to support the party is to join.
+            It&apos;s free and takes 30 seconds.
           </p>
           <Link
             href="/involved/join"

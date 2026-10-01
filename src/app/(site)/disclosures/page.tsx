@@ -105,10 +105,11 @@ export default function DisclosuresPage() {
           </p>
           {DONATIONS_PAUSED ? (
             <p>
-              The Mesocratic National Committee is not currently accepting
-              contributions while the committee completes its reorganization.
-              When donations reopen, all contributions will be subject to the
-              rules above and reported as required by law.
+              The Mesocratic National Committee is not yet accepting
+              contributions. We are completing the committee&apos;s
+              incorporation and opening its bank accounts. Once that work is
+              finished, all contributions will be subject to the rules above and
+              reported as required by law.
             </p>
           ) : (
             <p>

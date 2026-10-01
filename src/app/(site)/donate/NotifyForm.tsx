@@ -46,7 +46,7 @@ export default function NotifyForm() {
     return (
       <div className="rounded-lg border border-[#444] bg-[#2A2A2A] p-6 text-center">
         <p className="text-white font-semibold">
-          You&apos;re on the list. We&apos;ll email you when donations reopen.
+          You&apos;re on the list. We&apos;ll email you as soon as donations open.
         </p>
       </div>
     );
@@ -55,7 +55,7 @@ export default function NotifyForm() {
   return (
     <div className="rounded-lg border border-[#444] bg-[#2A2A2A] p-6">
       <h2 className="text-lg font-semibold text-white mb-4">
-        Tell me when donations reopen.
+        Tell me when donations open.
       </h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>

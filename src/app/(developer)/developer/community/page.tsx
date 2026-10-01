@@ -176,6 +176,15 @@ interface Release {
 
 const releases: Release[] = [
   {
+    version: "v1.0.1",
+    date: "October 1, 2026",
+    badge: "Notice",
+    badgeVariant: "gray",
+    changes: [
+      "Donations paused pending committee incorporation and new banking setup.",
+    ],
+  },
+  {
     version: "v1.0.0",
     date: "February 28, 2026",
     badge: "Current",
@@ -198,7 +207,8 @@ const releases: Release[] = [
     badge: "Initial",
     badgeVariant: "gray",
     changes: [
-      "Donation system built on custom Stripe + MCE integration. Live processing currently paused.",
+      "Donation system live at mesocrats.org/donate",
+      "Stripe payment processing with 7-step validation",
       "Supabase schema: donors, donations, donation_annual_totals",
       "FEC contribution limit enforcement ($44,300 individual-to-national-party)",
       "Five FEC-required attestation checkboxes",
