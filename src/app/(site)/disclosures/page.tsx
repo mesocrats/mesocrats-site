@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DONATIONS_PAUSED } from "@/lib/donations";
 
 export const metadata: Metadata = { title: "FEC Disclosures" };
 
@@ -102,19 +103,28 @@ export default function DisclosuresPage() {
             (IRS) and complies with all applicable federal and state disclosure
             requirements.
           </p>
-          <p>
-            We are committed to transparency in our fundraising, spending, and
-            governance. Contributions to the Mesocratic National Committee can
-            be made at{" "}
-            <a
-              href="/donate"
-              className="text-secondary hover:underline"
-            >
-              mesocrats.org/donate
-            </a>
-            . All contributions are processed via Stripe and reported to the
-            FEC in accordance with federal election law.
-          </p>
+          {DONATIONS_PAUSED ? (
+            <p>
+              The Mesocratic National Committee is not currently accepting
+              contributions while the committee completes its reorganization.
+              When donations reopen, all contributions will be subject to the
+              rules above and reported as required by law.
+            </p>
+          ) : (
+            <p>
+              We are committed to transparency in our fundraising, spending, and
+              governance. Contributions to the Mesocratic National Committee can
+              be made at{" "}
+              <a
+                href="/donate"
+                className="text-secondary hover:underline"
+              >
+                mesocrats.org/donate
+              </a>
+              . All contributions are processed via Stripe and reported to the
+              FEC in accordance with federal election law.
+            </p>
+          )}
         </section>
 
         <section>

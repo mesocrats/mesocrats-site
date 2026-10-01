@@ -125,8 +125,9 @@ Universal background checks. Due-process red-flag laws. Safe-storage incentives.
 - **Main site:** mesocrats.org -- 30+ pages, 15 policy pages, 18 white papers, 7 wired forms, CMS-driven via Sanity
 - **Developer Portal:** developer.mesocrats.org -- PartyStack, the open platform for American political technology
 - **PartyStack API:** 14 live endpoints for FEC compliance, contribution tracking, aggregate enforcement, disbursement management, report generation
-- **MCE (Mesocratic Compliance Engine):** ~1,700 lines of TypeScript handling FEC Form 3X, IRS 8872, Stripe fee capture, best-efforts tracking
-- **Tech Stack:** Next.js 14, TypeScript, Tailwind CSS, Supabase, Sanity CMS, Stripe, SendGrid, Vercel
+- **MCE (Mesocratic Compliance Engine):** ~1,700 lines of TypeScript handling FEC Form 3X, IRS 8872, best-efforts tracking
+- **Tech Stack:** Next.js 14, TypeScript, Tailwind CSS, Supabase, Sanity CMS, SendGrid, Vercel
+- **Donations are currently paused. Do not reference donating, contributions, or Stripe payment processing in posts.**
 - **Open Source:** MIT License. The infrastructure of democracy should not be proprietary.
 - **Prompt Library:** 6 AI prompt templates that let non-developers build FEC-compliant tools by pasting prompts into Claude
 - **Civic Platform (Planned):** vote.mesocrats.org -- internal digital voting platform for CCX State Rep elections

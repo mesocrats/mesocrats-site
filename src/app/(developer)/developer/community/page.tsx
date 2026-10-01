@@ -198,8 +198,7 @@ const releases: Release[] = [
     badge: "Initial",
     badgeVariant: "gray",
     changes: [
-      "Donation system live at mesocrats.org/donate",
-      "Stripe payment processing with 7-step validation",
+      "Donation system built on custom Stripe + MCE integration. Live processing currently paused.",
       "Supabase schema: donors, donations, donation_annual_totals",
       "FEC contribution limit enforcement ($44,300 individual-to-national-party)",
       "Five FEC-required attestation checkboxes",

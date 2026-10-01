@@ -103,7 +103,7 @@ function ComplianceAPICard() {
         {[
           "~1,700 lines TypeScript",
           "Production since Feb 2026",
-          "Processing real donations",
+          "Donation system built on custom Stripe + MCE integration. Live processing currently paused.",
           "MIT License",
         ].map((tag) => (
           <span

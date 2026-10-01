@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { DONATIONS_PAUSED } from "@/lib/donations";
 
 const siteUrl = "https://mesocrats.org";
 
@@ -46,7 +47,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/involved/volunteer`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteUrl}/candidates/run`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteUrl}/news`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
-    { url: `${siteUrl}/donate`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    // Donations are paused: keep /donate out of the sitemap entirely.
+    ...(DONATIONS_PAUSED
+      ? []
+      : [
+          {
+            url: `${siteUrl}/donate`,
+            lastModified: now,
+            changeFrequency: "monthly" as const,
+            priority: 0.7,
+          },
+        ]),
     { url: `${siteUrl}/contact`, lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: `${siteUrl}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${siteUrl}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },

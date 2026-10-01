@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { DONATIONS_PAUSED } from '@/lib/donations';
 import { createClient } from '@supabase/supabase-js';
 import { sendDonationReceipt } from '@/lib/donation-email';
 import { writeAuditLog } from '@/lib/mce/audit';
@@ -52,6 +53,15 @@ interface DonateRequestBody {
 }
 
 export async function POST(request: NextRequest) {
+  // Donations are paused site-wide: return before touching Stripe, Supabase,
+  // or MCE. Nothing is written to the database before this point.
+  if (DONATIONS_PAUSED) {
+    return NextResponse.json(
+      { error: 'Donations are temporarily paused.' },
+      { status: 503, headers: { 'Retry-After': '86400' } }
+    );
+  }
+
   const supabase = getSupabase();
   try {
     const body: DonateRequestBody = await request.json();

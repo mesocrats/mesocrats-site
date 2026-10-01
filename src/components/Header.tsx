@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { DONATIONS_PAUSED } from "@/lib/donations";
 
 interface NavChild {
   label: string;
@@ -14,12 +15,15 @@ interface NavItemWithChildren {
   label: string;
   href?: undefined;
   children: NavChild[];
+  isCta?: undefined;
 }
 
 interface NavItemDirect {
   label: string;
   href: string;
   children?: undefined;
+  /** Renders as an outlined call-to-action button instead of a plain link. */
+  isCta?: boolean;
 }
 
 type NavItem = NavItemWithChildren | NavItemDirect;
@@ -69,7 +73,10 @@ const navItems: NavItem[] = [
       { label: "Run for Office", href: "/candidates/run" },
     ],
   },
-  { label: "Donate", href: "/donate" },
+  // Donations are paused: send the primary CTA to membership instead.
+  DONATIONS_PAUSED
+    ? { label: "Join Us", href: "/involved/join", isCta: true }
+    : { label: "Donate", href: "/donate", isCta: true },
 ];
 
 export default function Header() {
@@ -149,7 +156,7 @@ export default function Header() {
                     </div>
                   )}
                 </div>
-              ) : item.label === "Donate" ? (
+              ) : item.isCta ? (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -253,7 +260,7 @@ export default function Header() {
                   </div>
                 )}
               </div>
-            ) : item.label === "Donate" ? (
+            ) : item.isCta ? (
               <Link
                 key={item.href}
                 href={item.href}

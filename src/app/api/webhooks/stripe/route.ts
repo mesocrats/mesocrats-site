@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+import { DONATIONS_PAUSED } from '@/lib/donations';
 
 function getSupabase() {
   return createClient(
@@ -15,6 +16,13 @@ function getSupabase() {
 }
 
 export async function POST(request: NextRequest) {
+  // Donations are paused and the Stripe account is closed. Acknowledge and drop
+  // without verifying signatures or touching Supabase, so any endpoint still
+  // registered stops retrying.
+  if (DONATIONS_PAUSED) {
+    return NextResponse.json({ received: true, paused: true });
+  }
+
   const supabase = getSupabase();
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
   const body = await request.text();

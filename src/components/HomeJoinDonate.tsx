@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DONATIONS_PAUSED } from "@/lib/donations";
 
 export default function HomeJoinDonate() {
   const [joinEmail, setJoinEmail] = useState("");
@@ -41,10 +42,20 @@ export default function HomeJoinDonate() {
 
 
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-2">
+    <section
+      className={
+        DONATIONS_PAUSED ? "bg-white" : "grid grid-cols-1 lg:grid-cols-2"
+      }
+    >
       {/* Join side */}
       <div className="bg-white py-16 px-6 sm:px-10 lg:px-16">
-        <div className="max-w-md mx-auto lg:mx-0 lg:ml-auto">
+        <div
+          className={
+            DONATIONS_PAUSED
+              ? "max-w-lg mx-auto"
+              : "max-w-md mx-auto lg:mx-0 lg:ml-auto"
+          }
+        >
           <h2 className="text-3xl font-bold mb-3">
             This Is Your Party. Come Build It.
           </h2>
@@ -98,7 +109,8 @@ export default function HomeJoinDonate() {
         </div>
       </div>
 
-      {/* Donate side */}
+      {/* Donate side - hidden while donations are paused */}
+      {!DONATIONS_PAUSED && (
       <div className="bg-primary text-white py-16 px-6 sm:px-10 lg:px-16">
         <div className="max-w-md mx-auto lg:mx-0">
           <h2 className="text-3xl font-bold mb-3">Fund the Middle Ground.</h2>
@@ -120,6 +132,7 @@ export default function HomeJoinDonate() {
           </p>
         </div>
       </div>
+      )}
     </section>
   );
 }

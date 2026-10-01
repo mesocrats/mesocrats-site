@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { client } from "@/sanity/lib/client";
 import { siteSettingsQuery } from "@/sanity/lib/queries";
+import { DONATIONS_PAUSED } from "@/lib/donations";
 
 /* ── Platform → icon mapping ── */
 const socialIcons: Record<string, LucideIcon> = {
@@ -100,10 +101,19 @@ export default async function Footer() {
     { next: { revalidate: 60 } }
   );
 
-  const columns: FooterColumn[] =
+  const mergedColumns: FooterColumn[] =
     settings?.footerColumns && settings.footerColumns.length > 0
       ? settings.footerColumns
       : F.footerColumns;
+
+  // Donations are paused: drop any /donate link, whether it came from Sanity or
+  // the hardcoded fallback above.
+  const columns: FooterColumn[] = DONATIONS_PAUSED
+    ? mergedColumns.map((section) => ({
+        ...section,
+        links: section.links.filter((link) => link.url !== "/donate"),
+      }))
+    : mergedColumns;
 
   const socialLinks: SocialLink[] = settings?.socialLinks || [];
 
